@@ -11,8 +11,6 @@ repos:
     -   id: check-docstring-first
     -   id: check-merge-conflict
     -   id: end-of-file-fixer
-    -   id: no-commit-to-branch
-        args: [--branch, master]
     -   id: trailing-whitespace
 
 -   repo: local
