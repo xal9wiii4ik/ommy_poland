@@ -1,0 +1,21 @@
+[flake8]
+# ANN101 - type annotation for self
+# ANN102 - type annotation for cls in class methods
+# T101 - TODO notes
+# T000 - TODO notes
+# FI** - weird future warning
+extend-ignore = FI10,FI11,FI12,FI13,FI14,FI15,FI16,FI17,FI18,ANN101,ANN102,T101,T000
+count = True
+max_line_length = 120
+max_complexity = 20
+extend-exclude =
+    .git,
+    __pycache__,
+    venv,
+    migrations
+
+# 1. Allow unittest asserts in tests
+# 2. Allow unused imports in __init__.py
+per-file-ignores =
+    **/tests/*: PT009, T003
+    **/__init__.py: F401
