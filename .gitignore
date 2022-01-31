@@ -152,4 +152,4 @@ fabric.properties
 
 # DATABASE
 ommy_poland/db.sqlite3
-*/.env.db
+.env.db
