@@ -21,6 +21,7 @@ repos:
         language: system
         types: [python]
         stages: [push, commit]
+        args: ["--ignore-missing-imports"]
 
     -   id: autoflake
         name: Run autoflake

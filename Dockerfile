@@ -10,9 +10,9 @@ RUN apk update \
     libwebp openjpeg-dev libimagequant-dev
 
 RUN pip3 install --upgrade pip
-COPY ./ommy_poland .
-COPY ./entrypoints ./entrypoints
+COPY ./app .
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r ./requirements.txt
 
-RUN chmod +x /app/entrypoints/web_entrypoint.sh
+RUN chmod +x ./entrypoints/web_entrypoint.sh
+RUN chmod +x ./entrypoints/bot_entrypoint.sh

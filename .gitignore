@@ -151,5 +151,7 @@ crashlytics-build.properties
 fabric.properties
 
 # DATABASE
-ommy_poland/db.sqlite3
+app/db.sqlite3
 .env.db
+app/mediafiles
+app/staticfiles
