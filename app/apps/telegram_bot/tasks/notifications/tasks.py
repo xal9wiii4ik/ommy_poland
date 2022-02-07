@@ -40,6 +40,31 @@ def send_notification_with_new_order_to_order_chat(order_pk: int) -> None:
     logging.info(f'Notification to ommy chat with new order: {order_pk} was sent')
 
 
+@shared_task
+def notification_with_coming_order(order_pk: int) -> None:
+    """
+    Send notification with coming order
+    Args:
+        order_pk: order pk
+    """
+
+    from apps.order.models import Order
+    from apps.telegram_bot.loader import dp
+
+    logging.info(f'Send notifications to ommy chat with coming order to ommy chat {order_pk}')
+
+    order = Order.objects.get(pk=order_pk)
+    message = f'Coming order: {order_pk}\n' \
+              f'Start work time: {order.start_time}\n' \
+              f'Number Employees: {order.number_employees}\n' \
+              f'Phone number: {order.customer.phone_number}\n' \
+              f'First name: {order.customer.first_name}\n' \
+              f'Last name: {order.customer.last_name}\n'
+    dp.loop.run_until_complete(dp.bot.send_message(chat_id=settings.ORDER_CHAT_ID, text=message))
+
+    logging.info(f'Notification to ommy chat with coming order: {order_pk} was sent')
+
+
 # @shared_task
 # def send_notification_with_new_order_to_masters_chats(order_pk: int) -> None:
 #     """

@@ -7,4 +7,5 @@ aiogram==2.19
 drf-yasg
 celery
 redis
+boto3
 fleep

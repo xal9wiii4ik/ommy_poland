@@ -153,5 +153,5 @@ fabric.properties
 # DATABASE
 app/db.sqlite3
 .env.db
-app/mediafiles
-app/staticfiles
+*/mediafiles
+*/staticfiles

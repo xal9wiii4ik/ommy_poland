@@ -50,10 +50,7 @@ class OrderFileModelAdmin(admin.ModelAdmin):
             SafeString: class which display html in admin panel
         """
 
-        if obj.file_type == 'raster-image':
-            return mark_safe(f'<img src="{obj.file.url}" width="80" height="80" />')
-        else:
-            return f'file_type: {obj.file_type}'
+        return mark_safe(f'<img src="{obj.bucket_path}" width="80" height="80" />')
 
     @staticmethod
     def move_to_order(obj: OrderFile) -> SafeString:
@@ -68,4 +65,4 @@ class OrderFileModelAdmin(admin.ModelAdmin):
         link = reverse('admin:order_order_change', args=[obj.order.pk])
         return format_html(f'<a href="{link}">{obj.order.name}</a>')
 
-    list_display = ('pk', 'move_to_order', 'display_file', 'file_type')
+    list_display = ('pk', 'move_to_order', 'display_file')

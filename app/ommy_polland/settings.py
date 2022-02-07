@@ -186,12 +186,16 @@ CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'  # type: ignore
 
 # TELEGRAM SETTINGS
 BOT_TOKEN = os.environ.get('BOT_TOKEN')  # type: ignore
-ORDER_CHAT_ID = int(os.environ.get('ORDER_CHAT_ID'))  # type: ignore
-# ORDER_CHAT_ID = os.environ.get('ORDER_CHAT_ID')  # type: ignore
+ORDER_CHAT_ID = os.environ.get('ORDER_CHAT_ID')  # type: ignore
 STAGE_BOT_TOKEN = os.environ.get('STAGE_BOT_TOKEN')  # type: ignore
-# STAGE_ORDER_CHAT_ID = os.environ.get('STAGE_ORDER_CHAT_ID')  # type: ignore
-STAGE_ORDER_CHAT_ID = int(os.environ.get('STAGE_ORDER_CHAT_ID'))  # type: ignore
+STAGE_ORDER_CHAT_ID = os.environ.get('STAGE_ORDER_CHAT_ID')  # type: ignore
 ADMINS_CHAT_IDS = os.environ.get('ADMINS', default='').split(',')  # type: ignore
+
+# AWS
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')  # type: ignore
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')  # type: ignore
+ORDER_BUCKET = os.environ.get('ORDER_BUCKET')  # type: ignore
+BUCKET_REGION = os.environ.get('BUCKET_REGION')  # type: ignore
 
 # STATIC FILES
 STATIC_URL = "/staticfiles/"

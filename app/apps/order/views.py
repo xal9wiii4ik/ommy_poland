@@ -9,7 +9,10 @@ from rest_framework.mixins import CreateModelMixin
 from apps.order.serializers import OrderModelSerializer
 from apps.order.models import Order
 from apps.order.services_views import create_order_files
-from apps.telegram_bot.tasks.notifications.tasks import send_notification_with_new_order_to_order_chat
+from apps.telegram_bot.tasks.notifications.tasks import (
+    send_notification_with_new_order_to_order_chat,
+    notification_with_coming_order,
+)
 
 
 class OrderCreateOnlyViewSet(CreateModelMixin,
@@ -33,9 +36,9 @@ class OrderCreateOnlyViewSet(CreateModelMixin,
 
         if response.data.get('start_time') is not None:
             start_time = datetime.strptime(response.data.get('start_time'), "%Y-%m-%dT%H:%M:%S.%f%z")
-            start_time = start_time - timedelta(hours=3)
-            send_notification_with_new_order_to_order_chat.apply_async(eta=start_time, args=(response.data['id'],))
-        return response
+            start_time = start_time - timedelta(hours=3, minutes=30)
+            notification_with_coming_order.apply_async(eta=start_time, args=(response.data['id'],))
+        return Response(data={}, status=200)
 
     def perform_create(self, serializer: OrderModelSerializer) -> None:
         serializer.validated_data['customer'] = self.request.user
