@@ -35,6 +35,7 @@ INSTALLED_APPS = [
 
     'apps.order',
     'apps.telegram_bot',
+    'apps.master',
     'apps.account',
 ]
 

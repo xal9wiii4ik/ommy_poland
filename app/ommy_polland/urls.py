@@ -15,6 +15,7 @@ urlpatterns = [
 
     path('api/', include(('apps.account.urls', 'account'), namespace='account')),
     path('api/', include(('apps.order.urls', 'order'), namespace='order')),
+    path('api/', include(('apps.master.urls', 'master'), namespace='master')),
 ]
 
 urlpatterns += doc_urls

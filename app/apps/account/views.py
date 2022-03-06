@@ -38,4 +38,4 @@ class RegisterUserApiView(APIView):
         user = get_user_model().objects.create(**serializer_data)
         del serializer_data['password']
         serializer_data['id'] = user.id
-        return Response(data=serializer_data, status=status.HTTP_200_OK)
+        return Response(data=serializer_data, status=status.HTTP_201_CREATED)

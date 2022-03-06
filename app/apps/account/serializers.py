@@ -33,7 +33,7 @@ class UserRegisterSerializer(serializers.Serializer):
     Serializer for register new user
     """
 
-    username = serializers.CharField(max_length=50, required=False)
+    username = serializers.CharField(max_length=50, required=False, read_only=True)
     email = serializers.EmailField(max_length=100, required=False)
     phone_number = serializers.CharField(max_length=13, required=True)
     first_name = serializers.CharField(max_length=100, required=True)
@@ -54,7 +54,7 @@ class UserRegisterSerializer(serializers.Serializer):
         """
 
         if value.find('+') == 0 and value.replace('+', '').isdigit() and len(value) == 13:
-            if any(get_user_model().objects.filter(phone_number=value)):
+            if get_user_model().objects.filter(phone_number=value):
                 raise serializers.ValidationError({'User with this phone number already exist'})
             return value
         else:
@@ -75,7 +75,7 @@ class UserRegisterSerializer(serializers.Serializer):
         if value is not None:
             validate_email(value=value)
             accounts = get_user_model().objects.filter(email=value)
-            if any(accounts):
+            if accounts:
                 raise serializers.ValidationError({'User with this email already exist'})
         return value
 
@@ -94,24 +94,6 @@ class UserRegisterSerializer(serializers.Serializer):
         password_validation.validate_password(password=value)
         return value
 
-    @staticmethod
-    def validate_username(value: str) -> str:
-        """
-        Validate username
-        Args:
-            value: value
-        Raise:
-            exception if invalid field
-        Returns:
-             value
-        """
-
-        if value is not None:
-            accounts = get_user_model().objects.filter(username=value)
-            if any(accounts):
-                raise serializers.ValidationError({'User with this username already exist'})
-        return value
-
     def validate(self, attrs: tp.Dict[str, tp.Any]) -> tp.Dict[str, tp.Any]:
         """
         Validate all fields
@@ -126,5 +108,5 @@ class UserRegisterSerializer(serializers.Serializer):
         if attrs.get('password') != attrs.get('repeat_password'):
             raise serializers.ValidationError({'repeat_password': 'Repeat password should be equal to password'})
         attrs['password'] = make_password(password=attrs['password'])
-        attrs['username'] = attrs.get('phone_number') if attrs.get('username') is None else attrs.get('username')
+        attrs['username'] = attrs.get('phone_number')
         return attrs
