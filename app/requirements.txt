@@ -9,3 +9,7 @@ celery
 redis
 boto3
 fleep
+numpy
+pandas
+sklearn
+xgboost
