@@ -81,6 +81,8 @@ class Order(models.Model):
         choices=[(order_status.name, order_status.value) for order_status in OrderStatus],
         default=OrderStatus.OPEN.value
     )
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='longitude in degrees')
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='latitude in degrees')
 
     def __str__(self) -> str:
         return f'pk: {self.pk}, name: {self.name}, address: {self.address}, ' \

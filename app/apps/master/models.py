@@ -14,6 +14,7 @@ class Master(User):
     work_experience = models.PositiveIntegerField(verbose_name='work experience')
     longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='longitude in degrees')
     latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='latitude in degrees')
+    city = models.CharField(max_length=100, verbose_name='city')
 
     def __str__(self) -> str:
-        return f'pk: {self.pk}, first_name: {self.first_name}, last_name: {self.last_name}'
+        return f'pk: {self.pk}, first_name: {self.first_name}, last_name: {self.last_name}, city: {self.city}'
