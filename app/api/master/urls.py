@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework.routers import SimpleRouter
 
-from apps.master.views import MasterModelViewSet, RegisterMasterApiView
+from api.master.views import MasterModelViewSet, RegisterMasterApiView
 
 router = SimpleRouter()
 

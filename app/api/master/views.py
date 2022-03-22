@@ -9,8 +9,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
-from apps.master.models import Master
-from apps.master.serializers import MasterModelSerializer, MasterRegisterSerializer
+from api.master.models import Master
+from api.master.serializers import MasterModelSerializer, MasterRegisterSerializer
+from api.master.services import create_master_account
 
 
 class RegisterMasterApiView(APIView):
@@ -25,10 +26,8 @@ class RegisterMasterApiView(APIView):
         serializer = MasterRegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer_data = serializer.data
-        del serializer_data['repeat_password']
-        master = Master.objects.create(**serializer_data)
-        del serializer_data['password']
-        serializer_data['id'] = master.id
+
+        create_master_account(data=serializer_data)
         return Response(data=serializer_data, status=status.HTTP_201_CREATED)
 
 
