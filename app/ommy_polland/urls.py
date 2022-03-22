@@ -14,9 +14,9 @@ urlpatterns = [
     path('token/', CustomTokenObtainPairView.as_view(), name='token'),
 
     path('api/', include(('api.account.urls', 'account'), namespace='account')),
-    path('api/auth/', include(('api.authenticate.urls', 'authenticate'), namespace='authenticate')),
-    # path('api/', include(('api.order.urls', 'order'), namespace='order')),
+    path('api/', include(('api.order.urls', 'order'), namespace='order')),
     path('api/', include(('api.master.urls', 'master'), namespace='master')),
+    path('api/', include(('api.authenticate.urls', 'authenticate'), namespace='authenticate')),
 ]
 
 urlpatterns += doc_urls

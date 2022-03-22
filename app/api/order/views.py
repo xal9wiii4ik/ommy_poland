@@ -10,10 +10,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin
 
-from apps.order.serializers import OrderModelSerializer
-from apps.order.models import Order
-from apps.order.services import create_order_files, find_order_masters, master_exist_in_city
-from apps.telegram_bot.tasks.notifications.tasks import (
+from api.order.serializers import OrderModelSerializer
+from api.order.models import Order
+from api.order.services import create_order_files, find_order_masters, master_exist_in_city
+from api.telegram_bot.tasks.notifications.tasks import (
     send_notification_with_new_order_to_order_chat,
     notification_with_coming_order,
 )

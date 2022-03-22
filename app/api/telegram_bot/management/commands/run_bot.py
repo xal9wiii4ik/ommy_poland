@@ -7,7 +7,7 @@ from aiogram.types import BotCommand
 
 from django.core.management.base import BaseCommand
 
-from apps.telegram_bot.loader import dp
+from api.telegram_bot.loader import dp
 from ommy_polland.settings import ADMINS_CHAT_IDS
 
 

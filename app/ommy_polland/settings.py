@@ -35,9 +35,9 @@ INSTALLED_APPS = [
 
     'api.authenticate',
     'api.master',
+    'api.order',
+    'api.telegram_bot',
     'api.account',
-    # 'apps.order',
-    # 'apps.telegram_bot',
 ]
 
 MIDDLEWARE = [

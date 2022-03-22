@@ -14,8 +14,8 @@ def send_notification_with_new_order_to_order_chat(order_pk: int) -> None:
         order_pk: current order pk
     """
 
-    from apps.order.models import Order
-    from apps.telegram_bot.loader import dp
+    from api.order.models import Order
+    from api.telegram_bot.loader import dp
 
     logging.info(f'Start send notification to ommy chat with new order: {order_pk}')
 
@@ -48,8 +48,8 @@ def notification_with_coming_order(order_pk: int) -> None:
         order_pk: order pk
     """
 
-    from apps.order.models import Order
-    from apps.telegram_bot.loader import dp
+    from api.order.models import Order
+    from api.telegram_bot.loader import dp
 
     logging.info(f'Send notifications to ommy chat with coming order to ommy chat {order_pk}')
 

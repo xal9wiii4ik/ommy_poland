@@ -11,8 +11,8 @@ def send_files_for_notifications(order: Model, chat_id: tp.Any) -> None:
         chat_id: chat_id
     """
 
-    from apps.order.models import OrderFile
-    from apps.telegram_bot.loader import dp
+    from api.order.models import OrderFile
+    from api.telegram_bot.loader import dp
 
     order_files = OrderFile.objects.filter(order=order)
 

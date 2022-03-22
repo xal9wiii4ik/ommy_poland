@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe, SafeString
 
-from apps.order.models import Order, OrderFile
+from api.order.models import Order, OrderFile
 
 
 @admin.register(Order)
