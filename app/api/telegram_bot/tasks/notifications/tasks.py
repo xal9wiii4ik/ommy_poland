@@ -2,7 +2,7 @@ import logging
 
 from celery import shared_task
 
-from apps.telegram_bot.tasks.notifications.services_notifications import send_files_for_notifications
+from api.telegram_bot.tasks.notifications.services_notifications import send_files_for_notifications
 from ommy_polland import settings
 
 

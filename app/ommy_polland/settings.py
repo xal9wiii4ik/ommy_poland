@@ -33,10 +33,11 @@ INSTALLED_APPS = [
 
     'drf_yasg',
 
-    'apps.order',
-    'apps.telegram_bot',
-    'apps.master',
-    'apps.account',
+    'api.authenticate',
+    'api.account',
+    # 'apps.order',
+    # 'apps.telegram_bot',
+    # 'apps.master',
 ]
 
 MIDDLEWARE = [
@@ -180,10 +181,8 @@ REDIS_PORT = os.environ.get('REDIS_PORT')  # type: ignore
 
 # CELERY
 CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'  # type: ignore
-# CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'  # type: ignore
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
 CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'  # type: ignore
-# CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'  # type: ignore
 
 # TELEGRAM SETTINGS
 BOT_TOKEN = os.environ.get('BOT_TOKEN')  # type: ignore
@@ -197,6 +196,11 @@ AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')  # type: ignore
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')  # type: ignore
 ORDER_BUCKET = os.environ.get('ORDER_BUCKET')  # type: ignore
 BUCKET_REGION = os.environ.get('BUCKET_REGION')  # type: ignore
+
+# TWILIO
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')  # type: ignore
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')  # type: ignore
+TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')  # type: ignore
 
 # STATIC FILES
 STATIC_URL = "/staticfiles/"

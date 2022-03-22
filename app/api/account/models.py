@@ -15,6 +15,7 @@ class User(AbstractUser):
                                max_length=100,
                                null=True,
                                blank=True)
+    is_master = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f'pk: {self.pk}, username: {self.username}, email: {self.email}, ' \
