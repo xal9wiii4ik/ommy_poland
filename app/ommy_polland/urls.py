@@ -13,10 +13,10 @@ urlpatterns = [
 
     path('token/', CustomTokenObtainPairView.as_view(), name='token'),
 
-    path('api/account/', include(('api.account.urls', 'account'), namespace='account')),
+    path('api/', include(('api.account.urls', 'account'), namespace='account')),
     path('api/auth/', include(('api.authenticate.urls', 'authenticate'), namespace='authenticate')),
     # path('api/', include(('api.order.urls', 'order'), namespace='order')),
-    # path('api/', include(('api.master.urls', 'master'), namespace='master')),
+    path('api/', include(('api.master.urls', 'master'), namespace='master')),
 ]
 
 urlpatterns += doc_urls

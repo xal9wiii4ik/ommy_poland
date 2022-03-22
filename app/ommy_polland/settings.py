@@ -34,10 +34,10 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     'api.authenticate',
+    'api.master',
     'api.account',
     # 'apps.order',
     # 'apps.telegram_bot',
-    # 'apps.master',
 ]
 
 MIDDLEWARE = [
