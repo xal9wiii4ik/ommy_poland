@@ -47,7 +47,7 @@ def calculate_distance(order_longitude: float,
     return distance_kilometers
 
 
-def master_exist_in_city(city: str) -> tp.Union[QuerySet, bool]:
+def master_exist_in_city(city: str) -> QuerySet:
     """
     Check if master exist in order city
     Args:
@@ -58,10 +58,9 @@ def master_exist_in_city(city: str) -> tp.Union[QuerySet, bool]:
     """
 
     masters = Master.objects.filter(city=city)
-    return masters if masters else False
+    return masters
 
 
-# TODO add order pk
 def find_order_masters(order_pk: int,
                        order_longitude: float,
                        order_latitude: float,

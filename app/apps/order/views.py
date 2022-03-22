@@ -30,6 +30,7 @@ class OrderCreateOnlyViewSet(CreateModelMixin,
     parser_classes = (MultiPartParser, JSONParser)
     permission_classes = (IsAuthenticated,)
 
+    # TODO add tests
     def create(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
         # check if master exist in oder city
         masters = master_exist_in_city(city=request.data['city'])
