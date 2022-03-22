@@ -10,6 +10,7 @@ from django.db.models import QuerySet
 from apps.master.models import Master
 from apps.master.tasks.order_notification.tasks import send_notification_with_new_order_to_masters
 from apps.order.models import Order, OrderFile
+from apps.utils.search_masters.eval import MasterComplianceAssessment
 
 from ommy_polland.settings import ORDER_BUCKET, BUCKET_REGION
 
@@ -61,6 +62,28 @@ def master_exist_in_city(city: str) -> QuerySet:
     return masters
 
 
+def generate_masters_queue(data: tp.List[tp.List[tp.Union[int, float]]], masters: QuerySet) -> tp.List[str]:
+    """
+    Generate masters queue
+    Args:
+        data: a list with the data needed to generate the probability of the master
+        masters: Queryset with masters
+    Returns:
+        sorted masters phone numbers
+    """
+
+    # get masters probabilities
+    model = MasterComplianceAssessment()
+    masters_probabilities = model.get_masters_probabilities(data)
+
+    # creating a queue of masters and getting sort list with phone numbers
+    masters_phone_numbers = [master.phone_number for master in masters]
+    masters_queue = list(zip(masters_phone_numbers, masters_probabilities))
+    sorted_masters_queue = sorted(masters_queue, key=lambda x: x[1], reverse=True)
+    sort_masters_phone_numbers = [masters_queue_item[0] for masters_queue_item in sorted_masters_queue]
+    return sort_masters_phone_numbers
+
+
 def find_order_masters(order_pk: int,
                        order_longitude: float,
                        order_latitude: float,
@@ -76,8 +99,6 @@ def find_order_masters(order_pk: int,
         dict with success message
     """
 
-    from apps.utils.search_masters.eval import MasterComplianceAssessment
-
     data = []
 
     for master in masters:
@@ -90,20 +111,12 @@ def find_order_masters(order_pk: int,
             ), master.work_experience, 1, 1, 1, 1, 1.6]
         )
 
-    # get masters probabilities
-    model = MasterComplianceAssessment()
-    masters_probabilities = model.get_masters_probabilities(data)
-
-    # creating a queue of masters and getting sort list with phone numbers
-    masters_phone_numbers = [master.phone_number for master in masters]
-    masters_queue = list(zip(masters_phone_numbers, masters_probabilities))
-    sorted_masters_queue = sorted(masters_queue, key=lambda x: x[1], reverse=True)
-    sort_masters_phone_numbers = [masters_queue_item[0] for masters_queue_item in sorted_masters_queue]
+    sort_masters_phone_numbers = generate_masters_queue(data=data, masters=masters)
 
     send_notification_with_new_order_to_masters.delay(order_pk, sort_masters_phone_numbers)
 
     # TODO ask/update message
-    return {'success': f'We find {len(masters_queue)} masters for your order'}
+    return {'success': f'We find {len(sort_masters_phone_numbers)} masters for your order'}
 
 
 def create_order_files(order_id: int, files: tp.List[tp.IO]) -> None:
