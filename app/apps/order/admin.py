@@ -31,7 +31,7 @@ class OrderModelAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'description', 'customer',
                     'start_time', 'price', 'address',
                     'date_created', 'status',
-                    'display_work_sphere_name')
+                    'display_work_sphere_name', 'longitude', 'latitude')
 
 
 @admin.register(OrderFile)

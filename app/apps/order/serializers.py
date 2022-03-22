@@ -1,5 +1,3 @@
-
-
 from rest_framework import serializers
 
 from apps.order.models import Order, OrderFile
@@ -23,6 +21,7 @@ class OrderModelSerializer(serializers.ModelSerializer):
     """
 
     files = OrderImageModelSerializer(many=True, required=False)
+    city = serializers.CharField(max_length=100, write_only=True)
 
     class Meta:
         model = Order
