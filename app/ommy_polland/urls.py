@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-from apps.account.views import CustomTokenObtainPairView
+from api.authenticate.views import CustomTokenObtainPairView
 
 from ommy_polland.yasg import urlpatterns as doc_urls
 from ommy_polland import settings
@@ -13,9 +13,10 @@ urlpatterns = [
 
     path('token/', CustomTokenObtainPairView.as_view(), name='token'),
 
-    path('api/', include(('apps.account.urls', 'account'), namespace='account')),
-    path('api/', include(('apps.order.urls', 'order'), namespace='order')),
-    path('api/', include(('apps.master.urls', 'master'), namespace='master')),
+    path('api/account/', include(('api.account.urls', 'account'), namespace='account')),
+    path('api/auth/', include(('api.authenticate.urls', 'authenticate'), namespace='authenticate')),
+    # path('api/', include(('api.order.urls', 'order'), namespace='order')),
+    # path('api/', include(('api.master.urls', 'master'), namespace='master')),
 ]
 
 urlpatterns += doc_urls
