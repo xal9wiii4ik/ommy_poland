@@ -4,6 +4,7 @@ import fleep
 
 
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 
@@ -83,6 +84,12 @@ class Order(models.Model):
     )
     longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='longitude in degrees')
     latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='latitude in degrees')
+    types_of_work = ArrayField(
+        models.CharField(max_length=200),
+        null=True,
+        blank=True,
+        verbose_name='types of work'
+    )
 
     def __str__(self) -> str:
         return f'pk: {self.pk}, name: {self.name}, address: {self.address}, ' \
