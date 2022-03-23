@@ -18,7 +18,7 @@ DEBUG = os.environ.get('DEBUG', default=True)  # type: ignore
 ALLOWED_HOSTS: tp.List[str] = os.environ.get('ALLOWED_HOSTS', default='').split(',')  # type: ignore
 
 # CORS_ALLOWED_ORIGINS = ['*']
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -199,6 +199,8 @@ AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')  # type: ignore
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')  # type: ignore
 ORDER_BUCKET = os.environ.get('ORDER_BUCKET')  # type: ignore
 BUCKET_REGION = os.environ.get('BUCKET_REGION')  # type: ignore
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 # STATIC FILES
 STATIC_URL = "/staticfiles/"
