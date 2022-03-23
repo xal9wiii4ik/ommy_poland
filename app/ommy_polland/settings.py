@@ -17,8 +17,6 @@ DEBUG = os.environ.get('DEBUG', default=True)  # type: ignore
 
 ALLOWED_HOSTS: tp.List[str] = os.environ.get('ALLOWED_HOSTS', default='').split(',')  # type: ignore
 
-CORS_ALLOWED_ORIGINS = ['*']
-
 # Application definition
 
 INSTALLED_APPS = [
