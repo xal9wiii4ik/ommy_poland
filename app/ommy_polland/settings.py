@@ -15,11 +15,11 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='123')  # type: ignore
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', default=True)  # type: ignore
 
+# MANAGEMENT HOSTS AND CORS
 ALLOWED_HOSTS: tp.List[str] = os.environ.get('ALLOWED_HOSTS', default='').split(',')  # type: ignore
-
-# CORS_ALLOWED_ORIGINS = ['*']
-# CORS_ORIGIN_ALLOW_ALL = True
-# Application definition
+# CORS_ALLOWED_ORIGINS: tp.List[str] = os.environ.get('CORS_ALLOWED_ORIGINS', default='').split(',')  # type: ignore
+# TODO update this(can be on stage, not prod)
+CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -116,7 +116,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_PERMISSIONS_CLASSES': (
         'rest_framework.permissions.AllowAny',
-        'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -128,20 +127,25 @@ REST_FRAMEWORK = {
 }
 
 # SIMPLE JWT SETTINGS
+ACCESS_TOKEN_LIFETIME = int(os.environ.get('ACCESS_TOKEN_LIFETIME', 20))
+REFRESH_TOKEN_LIFETIME = int(os.environ.get('REFRESH_TOKEN_LIFETIME', 60))
+ALGORITHM = os.environ.get('ALGORITHM')
+AUTH_HEADER_TYPES = os.environ.get('AUTH_HEADER_TYPES')
+
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=600),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=13),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=ACCESS_TOKEN_LIFETIME),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=REFRESH_TOKEN_LIFETIME),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
 
-    'ALGORITHM': 'HS256',
+    'ALGORITHM': ALGORITHM,
     'SIGNING_KEY': SECRET_KEY,
     'VERIFYING_KEY': None,
     'AUDIENCE': None,
     'ISSUER': None,
 
-    'AUTH_HEADER_TYPES': ('Token',),
+    'AUTH_HEADER_TYPES': (AUTH_HEADER_TYPES,),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
@@ -203,8 +207,6 @@ BUCKET_REGION = os.environ.get('BUCKET_REGION')  # type: ignore
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')  # type: ignore
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')  # type: ignore
 TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')  # type: ignore
-
-CORS_ORIGIN_ALLOW_ALL = True
 
 # STATIC FILES
 STATIC_URL = "/staticfiles/"

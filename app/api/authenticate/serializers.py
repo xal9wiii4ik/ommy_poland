@@ -3,9 +3,25 @@ import typing as tp
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
 from ommy_polland import settings
+
+
+class CookieTokenRefreshSerializer(TokenRefreshSerializer):
+    """
+    Custom serializer for refresh token
+    """
+
+    refresh = None
+
+    def validate(self, attrs):
+        attrs['refresh'] = self.context['request'].COOKIES.get('refresh')
+        if attrs['refresh']:
+            return super().validate(attrs)
+        else:
+            raise InvalidToken('No valid refresh token found in cookie')
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
