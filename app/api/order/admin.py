@@ -28,10 +28,9 @@ class OrderModelAdmin(admin.ModelAdmin):
             return obj.work_sphere.name
         return 'Work sphere was remove'
 
-    list_display = ('pk', 'name', 'description', 'customer',
-                    'start_time', 'price', 'address',
-                    'date_created', 'status',
-                    'display_work_sphere_name', 'longitude', 'latitude')
+    list_display = ('pk', 'name', 'customer',
+                    'start_time', 'price', 'status',
+                    'display_work_sphere_name', 'city')
 
 
 @admin.register(OrderFile)

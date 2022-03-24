@@ -9,7 +9,7 @@ class MasterComplianceAssessment:
     """
     def __init__(self):
         self.model = xgb.XGBClassifier()
-        self.model.load_model('apps/utils/search_masters/ommy_decision_engine_skl_002.json')
+        self.model.load_model('api/utils/search_masters/ommy_decision_engine_skl_002.json')
 
     def get_masters_probabilities(self, data: tp.List[tp.List[tp.Union[int, float]]]) -> tp.List[float]:
         """

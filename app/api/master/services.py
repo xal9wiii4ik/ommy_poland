@@ -33,6 +33,6 @@ def create_master_account(data: tp.Dict[str, tp.Any]):
         work_experience=data['work_experience'],
         longitude=data['longitude'],
         latitude=data['latitude'],
-        city=data['city']
+        city=data['city'].lower()
     )
     send_phone_activate_message.delay(user.id)

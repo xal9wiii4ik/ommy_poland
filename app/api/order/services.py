@@ -58,7 +58,7 @@ def master_exist_in_city(city: str) -> QuerySet:
         QuerySet if exist
     """
 
-    masters = Master.objects.filter(city=city)
+    masters = Master.objects.filter(city=city.lower())
     return masters
 
 
@@ -77,7 +77,7 @@ def generate_masters_queue(data: tp.List[tp.List[tp.Union[int, float]]], masters
     masters_probabilities = model.get_masters_probabilities(data)
 
     # creating a queue of masters and getting sort list with phone numbers
-    masters_phone_numbers = [master.phone_number for master in masters]
+    masters_phone_numbers = [master.user.phone_number for master in masters]
     masters_queue = list(zip(masters_phone_numbers, masters_probabilities))
     sorted_masters_queue = sorted(masters_queue, key=lambda x: x[1], reverse=True)
     sort_masters_phone_numbers = [masters_queue_item[0] for masters_queue_item in sorted_masters_queue]

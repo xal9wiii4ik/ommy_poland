@@ -90,6 +90,7 @@ class Order(models.Model):
         blank=True,
         verbose_name='types of work'
     )
+    city = models.CharField(max_length=100, verbose_name='city of the order')
 
     def __str__(self) -> str:
         return f'pk: {self.pk}, name: {self.name}, address: {self.address}, ' \
