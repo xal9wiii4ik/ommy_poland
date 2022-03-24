@@ -17,6 +17,8 @@ DEBUG = os.environ.get('DEBUG', default=True)  # type: ignore
 
 ALLOWED_HOSTS: tp.List[str] = os.environ.get('ALLOWED_HOSTS', default='').split(',')  # type: ignore
 
+# CORS_ALLOWED_ORIGINS = ['*']
+# CORS_ORIGIN_ALLOW_ALL = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -201,6 +203,8 @@ BUCKET_REGION = os.environ.get('BUCKET_REGION')  # type: ignore
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')  # type: ignore
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')  # type: ignore
 TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')  # type: ignore
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 # STATIC FILES
 STATIC_URL = "/staticfiles/"
