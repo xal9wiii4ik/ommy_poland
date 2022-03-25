@@ -54,7 +54,8 @@ class ActivateAccountApiView(APIView):
     """
 
     @swagger_auto_schema(request_body=ActivateAccountSerializer)
-    def post(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
+    def get(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
+        return Response(data={'success': 'HUI'}, status=status.HTTP_200_OK)
         serializer = ActivateAccountSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer_data = serializer.data
