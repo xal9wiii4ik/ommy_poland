@@ -17,6 +17,7 @@ DEBUG = os.environ.get('DEBUG', default=True)  # type: ignore
 
 # MANAGEMENT HOSTS AND CORS
 ALLOWED_HOSTS: tp.List[str] = os.environ.get('ALLOWED_HOSTS', default='').split(',')  # type: ignore
+CSRF_TRUSTED_ORIGINS: tp.List[str] = os.environ.get('CSRF_TRUSTED_ORIGINS', default='').split(',')  # type: ignore
 # CORS_ALLOWED_ORIGINS: tp.List[str] = os.environ.get('CORS_ALLOWED_ORIGINS', default='').split(',')  # type: ignore
 # TODO update this(can be on stage, not prod)
 CORS_ORIGIN_ALLOW_ALL = True
