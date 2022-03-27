@@ -14,3 +14,5 @@ pandas==1.4.1
 sklearn
 xgboost==1.5.2
 twilio==7.7.1
+types-mock==4.0.12
+mock==4.0.3
