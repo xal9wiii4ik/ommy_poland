@@ -12,6 +12,8 @@ from ommy_polland import settings
 def send_phone_activate_message(user_pk: int) -> None:
     """
     Send activate message
+    Args:
+        user_pk: user pk
     """
 
     from api.authenticate.models import ActivateAccountCode
@@ -28,4 +30,3 @@ def send_phone_activate_message(user_pk: int) -> None:
         from_=settings.TWILIO_PHONE_NUMBER,
         body=f'Your activation code: {activate_code.code}'
     )
-    print(activate_code)

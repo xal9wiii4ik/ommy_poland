@@ -11,15 +11,15 @@ class SetupAPITestCase(APITestCase):
     """ SetUp tests """
 
     def setUp(self) -> None:
-        password = make_password('password')
+        self.password = make_password('password')
         url = reverse('token')
 
         self.user_1 = get_user_model().objects.create(username='user_1',
                                                       is_staff=True,
-                                                      password=password,
+                                                      password=self.password,
                                                       is_active=True,
                                                       email='user_1@mail.ru',
-                                                      phone_number='+375292125978')
+                                                      phone_number='+375292125976')
         data = {
             'username': self.user_1.username,
             'password': 'password'
@@ -30,7 +30,7 @@ class SetupAPITestCase(APITestCase):
                        f'{token_data["access"]}'
 
         self.user_2 = get_user_model().objects.create(username='user_2',
-                                                      password=password,
+                                                      password=self.password,
                                                       is_active=True,
                                                       email='user_2@mail.ru',
                                                       phone_number='+375292125979')
@@ -44,7 +44,7 @@ class SetupAPITestCase(APITestCase):
                        f'{token_data["access"]}'
 
         self.user_3 = get_user_model().objects.create(username='user_3',
-                                                      password=password,
+                                                      password=self.password,
                                                       is_active=True,
                                                       email='user_3@mail.ru',
                                                       phone_number='+375292125971')

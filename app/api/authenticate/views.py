@@ -59,8 +59,8 @@ class ActivateAccountApiView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer_data = serializer.data
 
-        is_exist = activate_account(data=serializer_data)
-        if is_exist:
+        is_activated = activate_account(data=serializer_data)
+        if is_activated:
             return Response(data={'success': 'Account has been activated'}, status=status.HTTP_200_OK)
         return Response(data={'error': 'Account with this id and code does not exist'},
                         status=status.HTTP_400_BAD_REQUEST)
