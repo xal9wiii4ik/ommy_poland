@@ -1,9 +1,11 @@
 import json
+import mock
+import typing as tp
 
 from rest_framework.reverse import reverse
 
-from apps.master.models import Master
-from apps.utils.setup_tests import SetupAPITestCase
+from api.master.models import Master
+from api.utils.setup_tests import SetupAPITestCase
 
 
 class RegisterMasterTest(SetupAPITestCase):
@@ -11,7 +13,8 @@ class RegisterMasterTest(SetupAPITestCase):
     Test cases for register master
     """
 
-    def test_register_account(self) -> None:
+    @mock.patch('api.authenticate.tasks.activate_user.tasks.send_phone_activate_message.delay')
+    def test_register_account(self, *args: tp.List[tp.Any]) -> None:
         account_count = Master.objects.all().count()
 
         url = reverse('master:register')
@@ -24,7 +27,8 @@ class RegisterMasterTest(SetupAPITestCase):
             'phone_number': '+375292125918',
             'work_experience': 2,
             'longitude': 2.5,
-            'latitude': 2.6
+            'latitude': 2.6,
+            'city': 'some city'
         }
         json_data = json.dumps(data)
         response = self.client.post(path=url, data=json_data, content_type='application/json')

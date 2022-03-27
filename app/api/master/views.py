@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from api.master.models import Master
+from api.master.permissions import IsOwnerMasterPermission
 from api.master.serializers import MasterModelSerializer, MasterRegisterSerializer
 from api.master.services import create_master_account
 
@@ -42,3 +43,4 @@ class MasterModelViewSet(mixins.RetrieveModelMixin,
 
     queryset = Master.objects.all()
     serializer_class = MasterModelSerializer
+    permission_classes = (IsOwnerMasterPermission,)
