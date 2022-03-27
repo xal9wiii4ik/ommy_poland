@@ -21,7 +21,7 @@ CSRF_TRUSTED_ORIGINS: tp.List[str] = os.environ.get('CSRF_TRUSTED_ORIGINS', defa
 # CORS_ALLOWED_ORIGINS: tp.List[str] = os.environ.get('CORS_ALLOWED_ORIGINS', default='').split(',')  # type: ignore
 # TODO update this(can be on stage, not prod)
 CORS_ORIGIN_ALLOW_ALL = True
-CSRF_COOKIE_HTTPONLY = True
+CORS_ALLOW_CREDENTIALS = True
 
 INSTALLED_APPS = [
     'django.contrib.admin',
