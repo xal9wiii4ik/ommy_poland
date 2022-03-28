@@ -59,4 +59,4 @@ jobs:
       - name: Test
         env:
           COMPOSE_INTERACTIVE_NO_CLI: 1
-        run: docker-compose exec -T web python app/manage.py test app/
+        run: docker-compose exec -T web python manage.py test
