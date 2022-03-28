@@ -130,9 +130,13 @@ def create_order_files(order_id: int, files: tp.List[tp.IO]) -> None:
 
     for file in files:
         file_bytes = file.read()
-        file_info = fleep.get(file_bytes)
+        try:
+            file_info = fleep.get(file_bytes)
+        except TypeError:
+            logging.warning(msg=f'Not file for order: {order_id}')
+            continue
 
-        if not any(file_info.mime):
+        if not file_info.mime:
             logging.warning(msg=f'Something was wrong with file for order: {order_id}')
             continue
 

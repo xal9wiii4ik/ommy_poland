@@ -2,7 +2,7 @@
 from rest_framework import status
 from rest_framework.reverse import reverse
 
-from api.utils.setup_tests import SetupAPITestCase
+from api.utils.utils_tests.setup_tests import SetupAPITestCase
 
 
 class TestMasterModelViewSetTest(SetupAPITestCase):

@@ -1,7 +1,7 @@
 from rest_framework.exceptions import ValidationError, ErrorDetail
 
 from api.account.serializers import UserRegisterSerializer
-from api.utils.setup_tests import SetupAPITestCase
+from api.utils.utils_tests.setup_tests import SetupAPITestCase
 
 
 class RegisterUserTestCase(SetupAPITestCase):

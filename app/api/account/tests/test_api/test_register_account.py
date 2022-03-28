@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.reverse import reverse
 
 from api.authenticate.models import ActivateAccountCode
-from api.utils.setup_tests import SetupAPITestCase
+from api.utils.utils_tests.setup_tests import SetupAPITestCase
 
 
 class RegisterAccountTest(SetupAPITestCase):

@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import CreateModelMixin
+from rest_framework import mixins
 
 from api.order.serializers import OrderModelSerializer
 from api.order.models import Order
@@ -19,7 +19,8 @@ from api.telegram_bot.tasks.notifications.tasks import (
 )
 
 
-class OrderCreateOnlyViewSet(CreateModelMixin,
+class OrderCreateOnlyViewSet(mixins.ListModelMixin,
+                             mixins.CreateModelMixin,
                              GenericViewSet):
     """
     View Set for create only order
@@ -33,6 +34,8 @@ class OrderCreateOnlyViewSet(CreateModelMixin,
     # TODO add tests
     def create(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
         # check if master exist in oder city
+        if request.data.get('city') is None:
+            return Response(data={'city': 'Field is required'}, status=status.HTTP_400_BAD_REQUEST)
         masters = master_exist_in_city(city=request.data['city'])
         if not masters:
             return Response(
