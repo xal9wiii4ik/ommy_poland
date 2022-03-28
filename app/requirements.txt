@@ -21,4 +21,4 @@ aiohttp==3.8.1
 pre-commit==2.17.0
 mypy==0.941
 flake8==4.0.1
-ipython=8.1.1
+ipython==8.1.1
