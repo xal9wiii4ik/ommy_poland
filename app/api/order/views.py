@@ -12,7 +12,7 @@ from rest_framework import mixins
 
 from api.order.serializers import OrderModelSerializer
 from api.order.models import Order
-from api.order.services import create_order_files, find_order_masters, master_exist_in_city
+from api.order.services import create_order_files, master_exist_in_city
 from api.telegram_bot.tasks.notifications.tasks import (
     send_notification_with_new_order_to_order_chat,
     notification_with_coming_order,
@@ -57,11 +57,11 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
             notification_with_coming_order.apply_async(eta=start_time, args=(response.data['id'],))
 
         # create queue and send notifications to masters
-        masters_queue_info = find_order_masters(order_pk=response.data['id'],
-                                                order_longitude=float(request.data['longitude']),
-                                                order_latitude=float(request.data['latitude']),
-                                                masters=masters)
-        response.data.update(masters_queue_info)
+        # masters_queue_info = find_order_masters(order_pk=response.data['id'],
+        #                                         order_longitude=float(request.data['longitude']),
+        #                                         order_latitude=float(request.data['latitude']),
+        #                                         masters=masters)
+        # response.data.update(masters_queue_info)
         return response
 
     def perform_create(self, serializer: OrderModelSerializer) -> None:
