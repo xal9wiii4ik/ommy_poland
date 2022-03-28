@@ -6,7 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update
-RUN apt-get install --no-install-recommends -y git curl build-essential
+RUN apt-get install --no-install-recommends -y curl build-essential
+RUN apt-get install -y git
 RUN apt install -y netcat
 
 RUN pip3 install --upgrade pip
