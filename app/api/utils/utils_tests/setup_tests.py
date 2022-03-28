@@ -25,7 +25,7 @@ class SetupAPITestCase(APITestCase):
 
         # setup users and tokens
         self.password = make_password('password')
-        url = reverse('token')
+        url = reverse('authenticate:token')
 
         self.user_1 = get_user_model().objects.create(username='user_1',
                                                       is_staff=True,

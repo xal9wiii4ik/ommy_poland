@@ -24,7 +24,7 @@ class TestMasterModelViewSetTest(SetupAPITestCase):
                 'work_experience': 2,
                 'longitude': '14.000000',
                 'latitude': '15.000000',
-                'city': 'Wroclaw',
+                'city': 'wroclaw',
                 'user': self.user_master_1.pk
             },
             {
@@ -32,7 +32,7 @@ class TestMasterModelViewSetTest(SetupAPITestCase):
                 'work_experience': 10,
                 'longitude': '16.000000',
                 'latitude': '17.000000',
-                'city': 'Wroclaw',
+                'city': 'wroclaw',
                 'user': self.user_master_2.pk
             }
         ]
@@ -51,7 +51,7 @@ class TestMasterModelViewSetTest(SetupAPITestCase):
             'work_experience': 2,
             'longitude': '14.000000',
             'latitude': '15.000000',
-            'city': 'Wroclaw',
+            'city': 'wroclaw',
             'user': self.user_master_1.pk
         }
         self.assertEqual(response.json(), expected_data)

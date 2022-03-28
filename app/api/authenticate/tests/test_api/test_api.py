@@ -22,8 +22,8 @@ class TokensAPITestCase(APITestCase):
         )
 
     def test_pair(self) -> None:
-        url = reverse('token')
-        url_1 = reverse('token_refresh')
+        url = reverse('authenticate:token')
+        url_1 = reverse('authenticate:token_refresh')
 
         data = {
             'username': self.user_1.username,
@@ -38,7 +38,7 @@ class TokensAPITestCase(APITestCase):
         self.assertNotEqual(expected_data, response_1.json())
 
     def test_refresh(self) -> None:
-        url = reverse('token_refresh')
+        url = reverse('authenticate:token_refresh')
         response = self.client.post(url)
         expected_data = {'detail': 'No valid refresh token found in cookie', 'code': 'token_not_valid'}
         self.assertEqual(expected_data, response.json())

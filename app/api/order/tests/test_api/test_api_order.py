@@ -56,7 +56,4 @@ class OrderModelViewSetTest(SetupAPITestCase):
         }
         json_data = json.dumps(data)
         response = self.client.post(url, data=json_data, content_type='application/json')
-        print(response.json())
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        expected_data = {'masters': 'We dont have any masters in your city yet'}
-        self.assertEqual(response.json(), expected_data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
