@@ -12,6 +12,8 @@ from ommy_polland import settings
 def send_phone_activate_message(user_pk: int) -> None:
     """
     Send activate message
+    Args:
+        user_pk: user pk
     """
 
     from api.authenticate.models import ActivateAccountCode

@@ -1,0 +1,62 @@
+name: Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: create .env file
+        run: |
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          echo DEBUG=${{ secrets.DEBUG }} >> .env
+          echo TIME_ZONE=${{ secrets.TIME_ZONE }} >> .env
+          echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
+          echo CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }} >> .env
+          echo CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS }} >> .env
+          echo ACCESS_TOKEN_LIFETIME=${{ secrets.ACCESS_TOKEN_LIFETIME }} >> .env
+          echo REFRESH_TOKEN_LIFETIME=${{ secrets.REFRESH_TOKEN_LIFETIME }} >> .env
+          echo ALGORITHM=${{ secrets.ALGORITHM }} >> .env
+          echo AUTH_HEADER_TYPES=${{ secrets.AUTH_HEADER_TYPES }} >> .env
+          echo RDS_USERNAME=${{ secrets.RDS_USERNAME }} >> .env
+          echo DATABASE=${{ secrets.DATABASE }} >> .env
+          echo SQL_ENGINE=${{ secrets.SQL_ENGINE }} >> .env
+          echo SQL_DATABASE=${{ secrets.SQL_DATABASE }} >> .env
+          echo SQL_USER=${{ secrets.SQL_USER }} >> .env
+          echo SQL_PASSWORD=${{ secrets.SQL_PASSWORD }} >> .env
+          echo SQL_HOST=${{ secrets.SQL_HOST }} >> .env
+          echo SQL_PORT=${{ secrets.SQL_PORT }} >> .env
+          echo DEFAULT_SUPER_USER_USERNAME=${{ secrets.DEFAULT_SUPER_USER_USERNAME }} >> .env
+          echo DEFAULT_SUPER_USER_PASSWORD=${{ secrets.DEFAULT_SUPER_USER_PASSWORD }} >> .env
+          echo DEFAULT_SUPER_USER_EMAIL=${{ secrets.DEFAULT_SUPER_USER_EMAIL }} >> .env
+          echo BOT_TOKEN=${{ secrets.BOT_TOKEN }} >> .env
+          echo ORDER_CHAT_ID=${{ secrets.ORDER_CHAT_ID }} >> .env
+          echo STAGE_ORDER_CHAT_ID=${{ secrets.STAGE_ORDER_CHAT_ID }} >> .env
+          echo ADMINS=${{ secrets.ADMINS }} >> .env
+          echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
+          echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
+          echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} >> .env
+          echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} >> .env
+          echo ORDER_BUCKET=${{ secrets.ORDER_BUCKET }} >> .env
+          echo BUCKET_REGION=${{ secrets.BUCKET_REGION }} >> .env
+          echo TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }} >> .env
+          echo TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }} >> .env
+          echo TWILIO_PHONE_NUMBER=${{ secrets.TWILIO_PHONE_NUMBER }} >> .env
+      - name: create .env.db file
+        run: |
+          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env.db
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env.db
+          echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env.db
+      - name: Build docker
+        run: docker-compose up -d --build
+      - name: Test
+        env:
+          COMPOSE_INTERACTIVE_NO_CLI: 1
+        run: docker-compose exec -T web python manage.py test
