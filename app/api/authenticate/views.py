@@ -27,7 +27,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 
     def finalize_response(self, request: Request, response: Response, *args, **kwargs):
         if response.data.get('refresh'):
-            cookie_max_age = 3600 * settings.REFRESH_TOKEN_LIFETIME
+            cookie_max_age = 60 * settings.REFRESH_TOKEN_LIFETIME
             response.set_cookie('refresh', response.data['refresh'], max_age=cookie_max_age, httponly=True,
                                 domain='http://127.0.0.1:3000/', secure=True)
             del response.data['refresh']
@@ -46,7 +46,7 @@ class CookieTokenRefreshView(TokenRefreshView):
         print('request get')
         print(request.COOKIES.get('refresh'))
         if response.data.get('refresh'):
-            cookie_max_age = 3600 * settings.REFRESH_TOKEN_LIFETIME
+            cookie_max_age = 60 * settings.REFRESH_TOKEN_LIFETIME
             response.set_cookie('refresh', response.data['refresh'], max_age=cookie_max_age, httponly=True,
                                 domain='http://127.0.0.1:3000/', secure=True)
             del response.data['refresh']
