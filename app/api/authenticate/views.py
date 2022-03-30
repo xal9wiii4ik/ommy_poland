@@ -29,7 +29,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
         if response.data.get('refresh'):
             cookie_max_age = 3600 * settings.REFRESH_TOKEN_LIFETIME
             response.set_cookie('refresh', response.data['refresh'], max_age=cookie_max_age, httponly=True,
-                                domain='127.0.0.1')
+                                domain='http://127.0.0.1:3000/')
             del response.data['refresh']
             print(response.cookies)
         return super().finalize_response(request, response, *args, **kwargs)
@@ -47,7 +47,7 @@ class CookieTokenRefreshView(TokenRefreshView):
         if response.data.get('refresh'):
             cookie_max_age = 3600 * settings.REFRESH_TOKEN_LIFETIME
             response.set_cookie('refresh', response.data['refresh'], max_age=cookie_max_age, httponly=True,
-                                domain='127.0.0.1')
+                                domain='http://127.0.0.1:3000/')
             del response.data['refresh']
         return super().finalize_response(request, response, *args, **kwargs)
 
