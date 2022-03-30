@@ -31,7 +31,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             response.set_cookie('refresh', response.data['refresh'], max_age=cookie_max_age, httponly=True,
                                 domain='http://127.0.0.1:3000/', secure=True)
             response.set_cookie('test', 'test', max_age=cookie_max_age,
-                                domain='127.0.0.1', secure=True)
+                                domain='http://127.0.0.1:3000/', secure=True)
             del response.data['refresh']
             print(response.cookies)
         return super().finalize_response(request, response, *args, **kwargs)
