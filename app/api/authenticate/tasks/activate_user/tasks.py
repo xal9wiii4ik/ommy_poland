@@ -28,4 +28,3 @@ def send_phone_activate_message(user_pk: int) -> None:
         from_=settings.TWILIO_PHONE_NUMBER,
         body=f'Your activation code: {activate_code.code}'
     )
-    print(activate_code)
