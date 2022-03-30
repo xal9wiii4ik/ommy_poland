@@ -17,7 +17,9 @@ class CookieTokenRefreshSerializer(TokenRefreshSerializer):
     refresh = None
 
     def validate(self, attrs):
+        print(self.context['request'].COOKIES)
         attrs['refresh'] = self.context['request'].COOKIES.get('refresh')
+        print(self.context['request'].COOKIES)
         if attrs['refresh']:
             return super().validate(attrs)
         else:
