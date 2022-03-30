@@ -43,7 +43,8 @@ class CookieTokenRefreshView(TokenRefreshView):
     serializer_class = CookieTokenRefreshSerializer
 
     def finalize_response(self, request: Request, response: Response, *args, **kwargs):
-        print(request.COOKIES)
+        print('request get')
+        print(request.COOKIES.get('refresh'))
         if response.data.get('refresh'):
             cookie_max_age = 3600 * settings.REFRESH_TOKEN_LIFETIME
             response.set_cookie('refresh', response.data['refresh'], max_age=cookie_max_age, httponly=True,
