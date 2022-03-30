@@ -25,11 +25,11 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 
     serializer_class = CustomTokenObtainPairSerializer
 
-    def finalize_response(self, request, response: Response, *args, **kwargs):
+    def finalize_response(self, request: Request, response: Response, *args, **kwargs):
         if response.data.get('refresh'):
             cookie_max_age = 3600 * settings.REFRESH_TOKEN_LIFETIME
             response.set_cookie('refresh', response.data['refresh'], max_age=cookie_max_age, httponly=True,
-                                domain='http://127.0.0.1:3000/')
+                                domain='http://127.0.0.1:3000/', secure=True)
             del response.data['refresh']
             print(response.cookies)
         return super().finalize_response(request, response, *args, **kwargs)
@@ -42,12 +42,12 @@ class CookieTokenRefreshView(TokenRefreshView):
 
     serializer_class = CookieTokenRefreshSerializer
 
-    def finalize_response(self, request: Request, response, *args, **kwargs):
+    def finalize_response(self, request: Request, response: Response, *args, **kwargs):
         print(request.COOKIES)
         if response.data.get('refresh'):
             cookie_max_age = 3600 * settings.REFRESH_TOKEN_LIFETIME
             response.set_cookie('refresh', response.data['refresh'], max_age=cookie_max_age, httponly=True,
-                                domain='http://127.0.0.1:3000/')
+                                domain='http://127.0.0.1:3000/', secure=True)
             del response.data['refresh']
         return super().finalize_response(request, response, *args, **kwargs)
 
