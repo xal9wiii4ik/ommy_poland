@@ -7,6 +7,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
+from api.master.models import Master
+
 
 def get_file_type(file_bytes: bytes) -> str:
     """
@@ -91,6 +93,14 @@ class Order(models.Model):
         verbose_name='types of work'
     )
     city = models.CharField(max_length=100, verbose_name='city of the order')
+    master = models.ForeignKey(
+        to=Master,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='order_master',
+        verbose_name='Order master'
+    )
 
     def __str__(self) -> str:
         return f'pk: {self.pk}, name: {self.name}, address: {self.address}, ' \

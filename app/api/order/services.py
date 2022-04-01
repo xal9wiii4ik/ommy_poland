@@ -5,6 +5,7 @@ import fleep
 
 from math import radians, cos, sin, sqrt, asin
 
+from django.utils import timezone
 from django.db.models import QuerySet
 
 from api.master.models import Master
@@ -113,7 +114,8 @@ def find_order_masters(order_pk: int,
 
     sort_masters_phone_numbers = generate_masters_queue(data=data, masters=masters)
 
-    send_notification_with_new_order_to_masters.delay(order_pk, sort_masters_phone_numbers)
+    start_time = timezone.now()
+    send_notification_with_new_order_to_masters.delay(order_pk, sort_masters_phone_numbers, start_time)
     return {'success': f'We find {len(sort_masters_phone_numbers)} masters for your order'}
 
 
