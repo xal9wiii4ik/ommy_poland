@@ -25,7 +25,7 @@ def send_notification_with_new_order_to_masters(order_pk: int,
 
     order = Order.objects.get(pk=order_pk)
     if order.master is None:
-        wait_time = datetime.strptime(current_time, '%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(seconds=30)
+        wait_time = datetime.strptime(current_time, '%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(minutes=15)
 
         client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
         message = f'Новая заявка!\n' \
