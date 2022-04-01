@@ -28,9 +28,10 @@ def send_notification_with_new_order_to_masters(order_pk: int,
         wait_time = datetime.strptime(current_time, '%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(minutes=15)
 
         client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        order_execute_time = f'{order.start_time:"%Y-%m-%dT%H:%M:%S.%f%z"}' if order.start_time is not None else 'now'
         message = f'Новая заявка!\n' \
                   f'Описание: {order.name}\n' \
-                  f'Когда нужно выполнить заказ: {order.start_time:"%Y-%m-%dT%H:%M:%S.%f%z"}\n' \
+                  f'Когда нужно выполнить заказ: {order_execute_time}\n' \
                   f'Предварительная цена: {order.price}\n' \
                   f'Коммисия сервиса: some 123\n' \
                   f'Стоимость без коммисии: some price\n' \
