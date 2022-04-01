@@ -2,6 +2,7 @@ import typing as tp
 
 from datetime import datetime, timedelta
 
+
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, JSONParser
 from rest_framework.permissions import IsAuthenticated
@@ -31,7 +32,7 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
     parser_classes = (MultiPartParser, JSONParser)
     permission_classes = (IsAuthenticated,)
 
-    # TODO add tests
+    # TODO update
     def create(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
         # check if master exist in oder city
         if request.data.get('city') is None:
@@ -52,7 +53,7 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
 
         # send coming notification if start time not now
         if response.data.get('start_time') is not None:
-            start_time = datetime.strptime(response.data.get('start_time'), "%Y-%m-%dT%H:%M:%S.%f%z")
+            start_time = datetime.strptime(response.data.get('start_time'), '%Y-%m-%dT%H:%M:%S.%f%z')
             start_time = start_time - timedelta(hours=3, minutes=30)
             notification_with_coming_order.apply_async(eta=start_time, args=(response.data['id'],))
 
