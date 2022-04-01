@@ -32,7 +32,6 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
     parser_classes = (MultiPartParser, JSONParser)
     permission_classes = (IsAuthenticated,)
 
-    # TODO update
     def create(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
         # check if master exist in oder city
         if request.data.get('city') is None:
