@@ -28,9 +28,10 @@ class OrderModelAdmin(admin.ModelAdmin):
             return obj.work_sphere.name
         return 'Work sphere was remove'
 
+    # TODO add masters to list display
     list_display = ('pk', 'name', 'customer',
                     'start_time', 'price', 'status',
-                    'display_work_sphere_name', 'city', 'master')
+                    'display_work_sphere_name', 'city')
 
 
 @admin.register(OrderFile)

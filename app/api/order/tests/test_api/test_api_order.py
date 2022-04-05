@@ -40,6 +40,7 @@ class OrderModelViewSetTest(SetupAPITestCase):
         self.assertEqual(response.json(), expected_data)
 
     @mock.patch('api.order.tasks.order_notification.tasks.send_notification_with_new_order_to_masters.delay')
+    @mock.patch('api.telegram_bot.tasks.notifications.tasks.send_notification_with_new_order_to_order_chat.delay')
     def test_create_order(self, *args: tp.Any) -> None:
         """
         Test Case for creating new order
