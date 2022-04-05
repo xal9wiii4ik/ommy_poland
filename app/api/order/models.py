@@ -93,9 +93,8 @@ class Order(models.Model):
         verbose_name='types of work'
     )
     city = models.CharField(max_length=100, verbose_name='city of the order')
-    master = models.ForeignKey(
+    master = models.ManyToManyField(
         to=Master,
-        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='order_master',
