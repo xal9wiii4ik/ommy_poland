@@ -16,18 +16,18 @@ services:
     depends_on:
       - db
 
-  bot:
-    restart: always
-    build: .
-    command: python manage.py run_bot
-    volumes:
-      - ./static_volume/:/staticfiles
-      - ./media_volume/:/mediafiles
-      - ./app/:/app/
-    env_file:
-      - ./.env
-    depends_on:
-      - web
+#  bot:
+#    restart: always
+#    build: .
+#    command: python manage.py run_bot
+#    volumes:
+#      - ./static_volume/:/staticfiles
+#      - ./media_volume/:/mediafiles
+#      - ./app/:/app/
+#    env_file:
+#      - ./.env
+#    depends_on:
+#      - web
 
   celery_worker:
     build: .
@@ -43,7 +43,7 @@ services:
     depends_on:
       - web
       - db
-      - bot
+#      - bot
       - redis
 
   db:
