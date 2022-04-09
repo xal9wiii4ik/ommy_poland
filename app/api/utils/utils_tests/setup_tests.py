@@ -106,6 +106,8 @@ class SetupAPITestCase(APITestCase):
             longitude=20,
             latitude=13
         )
+        self.order_1.master.add(self.master_1)
+
         self.order_2 = Order.objects.create(
             number_employees=2,
             desired_time_end_work='not now',
@@ -114,3 +116,4 @@ class SetupAPITestCase(APITestCase):
             longitude=10,
             latitude=8
         )
+        self.order_2.master.add(self.master_1)

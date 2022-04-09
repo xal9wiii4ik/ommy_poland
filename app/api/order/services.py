@@ -5,12 +5,14 @@ import fleep
 
 from math import radians, cos, sin, sqrt, asin
 
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.db.models import QuerySet
 
 from api.master.models import Master
-from api.order.tasks.order_notification.tasks import send_notification_with_new_order_to_masters
-from api.order.models import Order, OrderFile
+from api.order.tasks.order_notification.tasks import send_notification_with_new_order_to_masters, \
+    send_masters_info_to_customer
+from api.order.models import Order, OrderFile, OrderStatus
 from api.utils.search_masters.eval import MasterComplianceAssessment
 
 from ommy_polland.settings import ORDER_BUCKET, BUCKET_REGION
@@ -147,3 +149,30 @@ def create_order_files(order_id: int, files: tp.List[tp.IO]) -> None:
                                  Body=file_bytes)
         bucket_path = f'https://s3-{BUCKET_REGION}.amazonaws.com/{ORDER_BUCKET}/{file.key}'  # type: ignore
         OrderFile.objects.create(order=order, bucket_path=bucket_path)
+
+
+def add_master_to_order(order_pk: int, user: get_user_model) -> tp.Tuple[str, int]:
+    """
+    Add master to order
+    Args:
+        order_pk: order pk
+        user: current user
+    Returns:
+        response message, response status
+    """
+
+    try:
+        order = Order.objects.get(pk=order_pk)
+    except Order.DoesNotExist:
+        return 'Заказ не найден', 400
+
+    if order.number_employees <= order.master.all().count():
+        return 'Мы уже нашли достаточное кол-во мастеров для этого заказа', 400
+    order.master.add(user.master)
+
+    if order.number_employees == order.master.all().count():
+        send_masters_info_to_customer.delay(order_pk)
+
+    order.status = OrderStatus.ACCEPTED.name
+    order.save()
+    return 'Вы приняли заказ, подробности заказа: тут подробности', 200

@@ -55,3 +55,41 @@ def send_notification_with_new_order_to_masters(order_pk: int,
                     )
                 )
                 break
+
+
+# TODO add link to message
+# TODO add prefetch related(N+1) if necessary needed
+@shared_task
+def send_masters_info_to_customer(order_pk: int) -> None:
+    """
+    Send phone message with masters info to customer
+    Args:
+        order_pk: order pk
+    """
+
+    from api.order.models import Order
+
+    order = Order.objects.get(pk=order_pk)
+    masters = order.master.all()
+
+    message = 'Мастер(а) найден(ы)\n' \
+              'Информация о мастере(ах):\n'
+    for master in masters:
+        message += f'\tИмя мастера: {master.user.first_name} {master.user.last_name}\n' \
+                   f'\tТелефон мастера: {master.user.phone_number}\n'
+
+    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+    _ = client.messages.create(
+        to=order.customer.phone_number,
+        from_=settings.TWILIO_PHONE_NUMBER,
+        body=message
+    )
+
+
+@shared_task
+def send_search_master_status_to_customer(data):
+    """
+    Send notification with status of masters search(if not enough masters accept order or etc)
+    """
+
+    print(1)

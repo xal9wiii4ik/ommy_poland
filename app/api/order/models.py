@@ -95,7 +95,6 @@ class Order(models.Model):
     city = models.CharField(max_length=100, verbose_name='city of the order')
     master = models.ManyToManyField(
         to=Master,
-        null=True,
         blank=True,
         related_name='order_master',
         verbose_name='Order master'

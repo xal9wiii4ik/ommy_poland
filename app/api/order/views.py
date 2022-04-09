@@ -1,6 +1,7 @@
 import typing as tp
 
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -8,9 +9,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins
 
+from api.order.permissions import IsMasterPermission
 from api.order.serializers import OrderModelSerializer
 from api.order.models import Order
-from api.order.services import create_order_files, master_exist_in_city
+from api.order.services import create_order_files, master_exist_in_city, add_master_to_order
 from api.telegram_bot.tasks.notifications.tasks import (
     send_notification_with_new_order_to_order_chat,
 )
@@ -45,6 +47,8 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
             create_order_files(files=self.request.FILES.pop('files'),
                                order_id=response.data.get('id'))
         send_notification_with_new_order_to_order_chat.delay(response.data['id'])
+        # TODO add task for sending notification(timezone.now())
+
         # TODO update or remove
         # # send coming notification if start time not now
         # if response.data.get('start_time') is not None:
@@ -59,6 +63,14 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
         #                                         masters=masters)
         # response.data.update(masters_queue_info)
         return response
+
+    @action(detail=True,
+            methods=['PATCH'],
+            permission_classes=[IsMasterPermission],
+            url_path=r'master_acceptance')
+    def master_acceptance(self, request: Request, pk: int):
+        response_message, response_status = add_master_to_order(order_pk=pk, user=request.user)
+        return Response(data={'master': response_message}, status=response_status)
 
     def perform_create(self, serializer: OrderModelSerializer) -> None:
         serializer.validated_data['customer'] = self.request.user

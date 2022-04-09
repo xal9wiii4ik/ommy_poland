@@ -58,3 +58,48 @@ class OrderModelViewSetTest(SetupAPITestCase):
         json_data = json.dumps(data)
         response = self.client.post(url, data=json_data, content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_add_does_not_exist_order_master(self) -> None:
+        """
+        Test case for adding master to does not exist order
+        """
+
+        url = reverse('order:order-master-acceptance', args=(-1,))
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_master_1)
+        response = self.client.patch(url)
+        self.assertEqual({'master': 'Заказ не найден'}, response.data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_add_order_master_not_master(self) -> None:
+        """
+        Test case for adding master to order(not master)
+        """
+
+        url = reverse('order:order-master-acceptance', args=(-1,))
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_1)
+        response = self.client.patch(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_add_order_master_enough(self) -> None:
+        """
+        Test case for adding master to order(enough masters)
+        """
+
+        url = reverse('order:order-master-acceptance', args=(self.order_1.pk,))
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_master_1)
+        response = self.client.patch(url)
+        self.assertEqual({'master': 'Мы уже нашли достаточное кол-во мастеров для этого заказа'}, response.data)
+        self.assertEqual(response.status_code, 400)
+
+    @mock.patch('api.order.tasks.order_notification.tasks.send_masters_info_to_customer.delay')
+    def test_add_order_master(self, *args: tp.Any) -> None:
+        """
+        Test case for adding master to order
+        """
+
+        url = reverse('order:order-master-acceptance', args=(self.order_2.pk,))
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_master_2)
+        response = self.client.patch(url)
+        self.assertEqual(response.status_code, 200)
+        self.order_2.refresh_from_db()
+        self.assertEqual('ACCEPTED', self.order_2.status)
