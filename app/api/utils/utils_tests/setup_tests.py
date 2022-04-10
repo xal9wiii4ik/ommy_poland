@@ -4,6 +4,7 @@ import boto3
 from moto import mock_s3
 
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.contrib.auth.hashers import make_password
 
 from rest_framework.reverse import reverse
@@ -101,19 +102,33 @@ class SetupAPITestCase(APITestCase):
         self.order_1 = Order.objects.create(
             number_employees=1,
             desired_time_end_work='now',
-            status=OrderStatus.OPEN.value,
+            status=OrderStatus.OPEN.name,
             city='Wroclaw',
             longitude=20,
-            latitude=13
+            latitude=13,
+            start_time=timezone.now(),
+            customer=self.user_1
         )
         self.order_1.master.add(self.master_1)
 
         self.order_2 = Order.objects.create(
             number_employees=2,
             desired_time_end_work='not now',
-            status=OrderStatus.OPEN.value,
+            status=OrderStatus.OPEN.name,
             city='Minsk',
             longitude=10,
-            latitude=8
+            latitude=8,
+            start_time=timezone.now(),
+            customer=self.user_2
         )
         self.order_2.master.add(self.master_1)
+
+        self.order_3 = Order.objects.create(
+            number_employees=2,
+            desired_time_end_work='not now',
+            status=OrderStatus.CANCELED.name,
+            city='Minsk',
+            longitude=10,
+            latitude=8,
+            start_time=timezone.now()
+        )
