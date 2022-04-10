@@ -16,8 +16,10 @@ from api.order.permissions import IsCustomerPermission
 from api.order.tasks.order_notification.tasks import (
     send_notification_with_new_order_to_masters,
     send_masters_info_to_customer,
+    send_masters_notification_with_cancel_order,
 )
 from api.order.models import Order, OrderFile, OrderStatus
+from api.telegram_bot.tasks.notifications.tasks import send_cancel_order_to_order_chat
 from api.utils.search_masters.eval import MasterComplianceAssessment
 
 from ommy_polland.settings import ORDER_BUCKET, BUCKET_REGION
@@ -219,6 +221,10 @@ def cancel_order(order: Order, request: Request, view_name: str) -> tp.Tuple[tp.
     if has_object_permission:
         order.status = 'CANCELED'
         order.save()
+
+        send_masters_notification_with_cancel_order.delay(order.pk)
+        send_cancel_order_to_order_chat.delay(order.pk)
+
         return {'order': 'Заказ был отменен'}, 200
     else:
         return {'detail': 'You do not have permission to perform this action.'}, 403

@@ -83,6 +83,8 @@ class OrderModelViewSetTest(SetupAPITestCase):
         self.assertEqual({'detail': 'You do not have permission to perform this action.'}, response.data)
         self.assertEqual(response.status_code, 403)
 
+    @mock.patch('api.order.tasks.order_notification.tasks.send_masters_notification_with_cancel_order.delay')
+    @mock.patch('api.telegram_bot.tasks.notifications.tasks.send_cancel_order_to_order_chat.delay')
     def test_cancel_order(self) -> None:
         """
         Test case for cancel order

@@ -113,3 +113,29 @@ def send_search_master_status_to_customer(order_pk: int, current_time: str):
                       f'Вы можете продолжить поиск, если нажмете кнопку Продолжить на странице Заявки link here, ' \
                       f'или остановить поиск, если нажмете кнопку Отменить заяку {link}'
         send_phone_message(message=message, recipients_number=order.customer.phone_number)
+
+
+# TODO add prefetch related(N+1) if necessary needed
+@shared_task
+def send_masters_notification_with_cancel_order(order_pk: int) -> None:
+    """
+    Send notification to masters with cancel order
+    Args:
+        order_pk: order pk
+    """
+
+    from api.order.models import Order
+
+    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+
+    order = Order.objects.get(pk=order_pk)
+    order_masters = order.master.all()
+
+    message = f'Заказ {order.name}, по адресу {order.address} был отменен'
+
+    for master in order_masters:
+        _ = client.messages.create(
+            to=master.user.phone_number,
+            from_=settings.TWILIO_PHONE_NUMBER,
+            body=message
+        )
