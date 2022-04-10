@@ -69,7 +69,7 @@ class Order(models.Model):
     name = models.CharField(max_length=50, verbose_name='Name of order', null=True, blank=True)
     number_employees = models.IntegerField(verbose_name='number of employees')
     desired_time_end_work = models.CharField(max_length=10, verbose_name='desired time end of work')
-    start_time = models.DateTimeField(verbose_name='work start time', null=True, blank=True)
+    start_time = models.DateTimeField(verbose_name='work start time')
     price = models.DecimalField(max_digits=10,
                                 decimal_places=2,
                                 verbose_name='Order price',

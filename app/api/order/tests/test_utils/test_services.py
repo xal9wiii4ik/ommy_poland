@@ -23,7 +23,7 @@ class OrderServicesTest(SetupAPITestCase):
         image_mock.name = 'image.png'
 
         with open('api/utils/utils_tests/videoplayback.mp4', 'rb') as file:
-            create_order_files(order_id=self.order_1.pk, files=[file])
+            create_order_files(order=self.order_1, files=[file])
             self.assertEqual(OrderFile.objects.all().count(), order_files_count + 1)
 
     def test_create_order_files_not_file(self, *args: tp.Any) -> None:
@@ -35,5 +35,5 @@ class OrderServicesTest(SetupAPITestCase):
         image_mock = mock.MagicMock(spec=File)
         image_mock.name = 'image.png'
 
-        create_order_files(order_id=self.order_1.pk, files=[image_mock])
+        create_order_files(order=self.order_1, files=[image_mock])
         self.assertEqual(OrderFile.objects.all().count(), order_files_count)

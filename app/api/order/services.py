@@ -5,14 +5,21 @@ import fleep
 
 from math import radians, cos, sin, sqrt, asin
 
-from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 
+from rest_framework.request import Request
+
 from api.master.models import Master
-from api.order.tasks.order_notification.tasks import send_notification_with_new_order_to_masters, \
-    send_masters_info_to_customer
+from api.order.permissions import IsCustomerPermission
+from api.order.tasks.order_notification.tasks import (
+    send_notification_with_new_order_to_masters,
+    send_masters_info_to_customer,
+    send_masters_notification_with_cancel_order,
+)
 from api.order.models import Order, OrderFile, OrderStatus
+from api.telegram_bot.tasks.notifications.tasks import send_cancel_order_to_order_chat
 from api.utils.search_masters.eval import MasterComplianceAssessment
 
 from ommy_polland.settings import ORDER_BUCKET, BUCKET_REGION
@@ -118,19 +125,19 @@ def find_order_masters(order_pk: int,
 
     start_time = timezone.now()
     send_notification_with_new_order_to_masters.delay(order_pk, sort_masters_phone_numbers, start_time)
-    return {'success': f'We find {len(sort_masters_phone_numbers)} masters for your order'}
+    return {'success': f'Мы нашли {len(sort_masters_phone_numbers)} подходящих мастеров для вашего'}
 
 
-def create_order_files(order_id: int, files: tp.List[tp.IO]) -> None:
+def create_order_files(order: Order, files: tp.List[tp.IO]) -> None:
     """ Func for saving pictures in database
     Args:
-        order_id: post id
+        order: post id
         files: list with files
     """
 
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(ORDER_BUCKET)
-    order = Order.objects.get(pk=order_id)
+    order_id = order.pk
 
     for file in files:
         file_bytes = file.read()
@@ -151,24 +158,40 @@ def create_order_files(order_id: int, files: tp.List[tp.IO]) -> None:
         OrderFile.objects.create(order=order, bucket_path=bucket_path)
 
 
-def add_master_to_order(order_pk: int, user: get_user_model) -> tp.Tuple[str, int]:
+def get_order_or_404(order_pk: int) -> tp.Union[Order, int]:
+    """
+    Get order or 404
+    Args:
+        order_pk: order pk
+    Returns:
+        Order object or error message
+    """
+
+    try:
+        order = Order.objects.get(pk=order_pk)
+        return order
+    except Order.DoesNotExist:
+        return 404
+
+
+def add_master_to_order(order: Order, user: get_user_model) -> tp.Tuple[str, int]:
     """
     Add master to order
     Args:
-        order_pk: order pk
+        order: Order object
         user: current user
     Returns:
         response message, response status
     """
 
-    try:
-        order = Order.objects.get(pk=order_pk)
-    except Order.DoesNotExist:
-        return 'Заказ не найден', 400
+    order_pk = order.pk
 
     if order.number_employees <= order.master.all().count():
         return 'Мы уже нашли достаточное кол-во мастеров для этого заказа', 400
     order.master.add(user.master)
+
+    if order.status == 'CANCELED':
+        return 'К сожелению заказ был отменен, ожидайте остальные заказы', 400
 
     if order.number_employees == order.master.all().count():
         send_masters_info_to_customer.delay(order_pk)
@@ -176,3 +199,32 @@ def add_master_to_order(order_pk: int, user: get_user_model) -> tp.Tuple[str, in
     order.status = OrderStatus.ACCEPTED.name
     order.save()
     return 'Вы приняли заказ, подробности заказа: тут подробности', 200
+
+
+def cancel_order(order: Order, request: Request, view_name: str) -> tp.Tuple[tp.Dict[str, str], int]:
+    """
+    Cancel order
+    Args:
+        order: Order
+        request: Request
+        view_name: view name
+    Returns:
+        response dict, response status
+    """
+
+    permission_class = IsCustomerPermission()
+    has_object_permission = permission_class.has_object_permission(
+        request=request,
+        view=view_name,
+        obj=order
+    )
+    if has_object_permission:
+        order.status = 'CANCELED'
+        order.save()
+
+        send_masters_notification_with_cancel_order.delay(order.pk)
+        send_cancel_order_to_order_chat.delay(order.pk)
+
+        return {'order': 'Заказ был отменен'}, 200
+    else:
+        return {'detail': 'You do not have permission to perform this action.'}, 403

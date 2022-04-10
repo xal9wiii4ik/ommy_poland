@@ -5,6 +5,7 @@ from twilio.rest import Client
 
 from celery import shared_task
 
+from api.utils.tasks_utils import send_phone_message
 from ommy_polland import settings
 
 
@@ -24,7 +25,8 @@ def send_notification_with_new_order_to_masters(order_pk: int,
     from api.order.models import Order
 
     order = Order.objects.get(pk=order_pk)
-    if order.master is None:
+    order_masters = order.master.all().count()
+    if order.status != 'CANCELED' and order_masters < order.number_employees:
         wait_time = datetime.strptime(current_time, '%Y-%m-%dT%H:%M:%S.%f%z') + timedelta(minutes=15)
 
         client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
@@ -78,18 +80,62 @@ def send_masters_info_to_customer(order_pk: int) -> None:
         message += f'\tИмя мастера: {master.user.first_name} {master.user.last_name}\n' \
                    f'\tТелефон мастера: {master.user.phone_number}\n'
 
-    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-    _ = client.messages.create(
-        to=order.customer.phone_number,
-        from_=settings.TWILIO_PHONE_NUMBER,
-        body=message
-    )
+    send_phone_message(message=message, recipients_number=order.customer.phone_number)
 
 
+# TODO add link
+# TODO add logic if customer didnt click to cancel
 @shared_task
-def send_search_master_status_to_customer(data):
+def send_search_master_status_to_customer(order_pk: int, current_time: str):
     """
     Send notification with status of masters search(if not enough masters accept order or etc)
+    Args:
+        order_pk: order pk
+        current_time: current time
     """
 
-    print(1)
+    from api.order.models import Order
+
+    order = Order.objects.get(pk=order_pk)
+    order_masters_count = order.master.all().count()
+    number_employees = order.number_employees
+    current_datetime = datetime.strptime(current_time, '%Y-%m-%dT%H:%M:%S.%f%z')
+    link = 'link_here'
+    if number_employees < order_masters_count and order.status != 'CANCELED':
+        if current_datetime < order.start_time:
+            message = f'Продолжается поиск мастеров.\n' \
+                      f'Вы можете следить за статусом заявки на странице “Заявка”,\n' \
+                      f'а также отменить заявку, если необходимо. {link}'
+            task_execute_time = current_datetime + timedelta(minutes=30)
+            send_search_master_status_to_customer.apply_async(eta=task_execute_time, args=(order_pk, task_execute_time))
+        else:
+            message = f'Не удалось найти мастера. \n' \
+                      f'Вы можете продолжить поиск, если нажмете кнопку Продолжить на странице Заявки link here, ' \
+                      f'или остановить поиск, если нажмете кнопку Отменить заяку {link}'
+        send_phone_message(message=message, recipients_number=order.customer.phone_number)
+
+
+# TODO add prefetch related(N+1) if necessary needed
+@shared_task
+def send_masters_notification_with_cancel_order(order_pk: int) -> None:
+    """
+    Send notification to masters with cancel order
+    Args:
+        order_pk: order pk
+    """
+
+    from api.order.models import Order
+
+    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+
+    order = Order.objects.get(pk=order_pk)
+    order_masters = order.master.all()
+
+    message = f'Заказ {order.name}, по адресу {order.address} был отменен'
+
+    for master in order_masters:
+        _ = client.messages.create(
+            to=master.user.phone_number,
+            from_=settings.TWILIO_PHONE_NUMBER,
+            body=message
+        )

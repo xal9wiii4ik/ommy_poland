@@ -41,6 +41,20 @@ def send_notification_with_new_order_to_order_chat(order_pk: int) -> None:
 
 
 @shared_task
+def send_cancel_order_to_order_chat(order_pk: int) -> None:
+    """
+    Send notification to order chat with cancel order
+    Args:
+        order_pk: order pk
+    """
+
+    from api.telegram_bot.loader import dp
+
+    message = f'Order with id: {order_pk} was closed'
+    dp.loop.run_until_complete(dp.bot.send_message(chat_id=settings.ORDER_CHAT_ID, text=message))
+
+
+@shared_task
 def notification_with_coming_order(order_pk: int) -> None:
     """
     Send notification with coming order
