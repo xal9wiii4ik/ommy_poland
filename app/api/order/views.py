@@ -1,5 +1,7 @@
 import typing as tp
+from datetime import timedelta
 
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, JSONParser
@@ -9,10 +11,16 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins
 
-from api.order.permissions import IsMasterPermission
+from api.order.permissions import IsMasterPermission, IsCustomerPermission
 from api.order.serializers import OrderModelSerializer
 from api.order.models import Order
-from api.order.services import create_order_files, master_exist_in_city, add_master_to_order
+from api.order.services import (
+    create_order_files,
+    master_exist_in_city,
+    add_master_to_order,
+    find_order_masters, get_order_or_404,
+)
+from api.order.tasks.order_notification.tasks import send_search_master_status_to_customer
 from api.telegram_bot.tasks.notifications.tasks import (
     send_notification_with_new_order_to_order_chat,
 )
@@ -37,17 +45,31 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
         masters = master_exist_in_city(city=request.data['city'])
         if not masters:
             return Response(
-                data={'masters': 'We dont have any masters in your city yet'},
+                data={'masters': 'У нас пока что нет мастеров в вашем городе'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         # create order and order file and send notification
         response = super(OrderCreateOnlyViewSet, self).create(request, *args, **kwargs)
+
+        order = Order.objects.get(pk=response.data.get('id'))
+
         if request.FILES:
             create_order_files(files=self.request.FILES.pop('files'),
-                               order_id=response.data.get('id'))
+                               order=order)
+
         send_notification_with_new_order_to_order_chat.delay(response.data['id'])
-        # TODO add task for sending notification(timezone.now())
+
+        current_time = timezone.now()
+        status_execute_time = current_time + timedelta(minutes=30)
+        send_search_master_status_to_customer.apply_async(eta=status_execute_time, args=(order.pk, status_execute_time))
+
+        # create queue and send notifications to masters
+        masters_queue_info = find_order_masters(order_pk=response.data['id'],
+                                                order_longitude=float(request.data['longitude']),
+                                                order_latitude=float(request.data['latitude']),
+                                                masters=masters)
+        response.data.update(masters_queue_info)
 
         # TODO update or remove
         # # send coming notification if start time not now
@@ -55,13 +77,6 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
         #     start_time = datetime.strptime(response.data.get('start_time'), '%Y-%m-%dT%H:%M:%S.%f%z')
         #     start_time = start_time - timedelta(hours=3, minutes=30)
         #     notification_with_coming_order.apply_async(eta=start_time, args=(response.data['id'],))
-        #
-        # # create queue and send notifications to masters
-        # masters_queue_info = find_order_masters(order_pk=response.data['id'],
-        #                                         order_longitude=float(request.data['longitude']),
-        #                                         order_latitude=float(request.data['latitude']),
-        #                                         masters=masters)
-        # response.data.update(masters_queue_info)
         return response
 
     @action(detail=True,
@@ -69,8 +84,35 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
             permission_classes=[IsMasterPermission],
             url_path=r'master_acceptance')
     def master_acceptance(self, request: Request, pk: int):
-        response_message, response_status = add_master_to_order(order_pk=pk, user=request.user)
-        return Response(data={'master': response_message}, status=response_status)
+        order, order_status = get_order_or_404(order_pk=pk)
+        if isinstance(order, Order):
+            response_message, response_status = add_master_to_order(order=order, user=request.user)
+            return Response(data={'master': response_message}, status=response_status)
+        return Response(data={'order': order}, status=order_status)
+
+    @action(detail=True,
+            methods=['PATCH'],
+            permission_classes=[IsCustomerPermission],
+            url_path=r'cancel_order')
+    def cancel_order(self, request: Request, pk: int) -> Response:
+        order, order_status = get_order_or_404(order_pk=pk)
+        if isinstance(order, Order):
+            permission_class = IsCustomerPermission()
+            has_object_permission = permission_class.has_object_permission(
+                request=request,
+                view=self.get_view_name(),
+                obj=order
+            )
+            if has_object_permission:
+                order.status = 'CANCELED'
+                order.save()
+                return Response(data={'order': 'Заказ был отменен'}, status=200)
+            else:
+                return Response(
+                    data={'detail': 'You do not have permission to perform this action.'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        return Response(data={'order': order}, status=order_status)
 
     def perform_create(self, serializer: OrderModelSerializer) -> None:
         serializer.validated_data['customer'] = self.request.user

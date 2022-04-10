@@ -36,10 +36,11 @@ class OrderModelViewSetTest(SetupAPITestCase):
         json_data = json.dumps(data)
         response = self.client.post(url, data=json_data, content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        expected_data = {'masters': 'We dont have any masters in your city yet'}
+        expected_data = {'masters': 'У нас пока что нет мастеров в вашем городе'}
         self.assertEqual(response.json(), expected_data)
 
     @mock.patch('api.order.tasks.order_notification.tasks.send_notification_with_new_order_to_masters.delay')
+    @mock.patch('api.order.tasks.order_notification.tasks.send_search_master_status_to_customer.delay')
     @mock.patch('api.telegram_bot.tasks.notifications.tasks.send_notification_with_new_order_to_order_chat.delay')
     def test_create_order(self, *args: tp.Any) -> None:
         """
@@ -53,11 +54,48 @@ class OrderModelViewSetTest(SetupAPITestCase):
             'desired_time_end_work': 'now',
             'latitude': 20,
             'longitude': 12,
-            'number_employees': 2
+            'number_employees': 2,
+            'start_time': '2022-04-03T00:00:00+01:00'
         }
         json_data = json.dumps(data)
         response = self.client.post(url, data=json_data, content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_cancel_order_does_not_exist(self) -> None:
+        """
+        Test case for cancel order does not exist order
+        """
+
+        url = reverse('order:order-cancel-order', args=(-1,))
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_master_1)
+        response = self.client.patch(url)
+        self.assertEqual({'order': 'Заказ не найден'}, response.data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_cancel_order_not_owner(self) -> None:
+        """
+        Test case for cancel order does not exist order
+        """
+
+        url = reverse('order:order-cancel-order', args=(self.order_2.pk,))
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_master_1)
+        response = self.client.patch(url)
+        self.assertEqual({'detail': 'You do not have permission to perform this action.'}, response.data)
+        self.assertEqual(response.status_code, 403)
+
+    def test_cancel_order(self) -> None:
+        """
+        Test case for cancel order
+        """
+
+        self.assertEqual('OPEN', self.order_2.status)
+        url = reverse('order:order-cancel-order', args=(self.order_2.pk,))
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_2)
+        response = self.client.patch(url)
+        self.assertEqual({'order': 'Заказ был отменен'}, response.data)
+        self.assertEqual(response.status_code, 200)
+        self.order_2.refresh_from_db()
+        self.assertEqual('CANCELED', self.order_2.status)
 
     def test_add_does_not_exist_order_master(self) -> None:
         """
@@ -67,8 +105,8 @@ class OrderModelViewSetTest(SetupAPITestCase):
         url = reverse('order:order-master-acceptance', args=(-1,))
         self.client.credentials(HTTP_AUTHORIZATION=self.token_master_1)
         response = self.client.patch(url)
-        self.assertEqual({'master': 'Заказ не найден'}, response.data)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual({'order': 'Заказ не найден'}, response.data)
+        self.assertEqual(response.status_code, 404)
 
     def test_add_order_master_not_master(self) -> None:
         """
@@ -89,6 +127,17 @@ class OrderModelViewSetTest(SetupAPITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=self.token_master_1)
         response = self.client.patch(url)
         self.assertEqual({'master': 'Мы уже нашли достаточное кол-во мастеров для этого заказа'}, response.data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_add_order_canceled(self) -> None:
+        """
+        Test case for adding master to order(enough masters)
+        """
+
+        url = reverse('order:order-master-acceptance', args=(self.order_3.pk,))
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_master_1)
+        response = self.client.patch(url)
+        self.assertEqual({'master': 'К сожелению заказ был отменен, ожидайте остальные заказы'}, response.data)
         self.assertEqual(response.status_code, 400)
 
     @mock.patch('api.order.tasks.order_notification.tasks.send_masters_info_to_customer.delay')
