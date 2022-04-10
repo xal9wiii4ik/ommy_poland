@@ -1,7 +1,9 @@
 import typing as tp
+
 from datetime import timedelta
 
 from django.utils import timezone
+
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, JSONParser
@@ -18,7 +20,8 @@ from api.order.services import (
     create_order_files,
     master_exist_in_city,
     add_master_to_order,
-    find_order_masters, get_order_or_404,
+    find_order_masters,
+    get_order_or_404, cancel_order,
 )
 from api.order.tasks.order_notification.tasks import send_search_master_status_to_customer
 from api.telegram_bot.tasks.notifications.tasks import (
@@ -84,35 +87,22 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
             permission_classes=[IsMasterPermission],
             url_path=r'master_acceptance')
     def master_acceptance(self, request: Request, pk: int):
-        order, order_status = get_order_or_404(order_pk=pk)
+        order = get_order_or_404(order_pk=pk)
         if isinstance(order, Order):
             response_message, response_status = add_master_to_order(order=order, user=request.user)
             return Response(data={'master': response_message}, status=response_status)
-        return Response(data={'order': order}, status=order_status)
+        return Response(data={'order': 'Заказ не найден'}, status=order)
 
     @action(detail=True,
             methods=['PATCH'],
             permission_classes=[IsCustomerPermission],
             url_path=r'cancel_order')
     def cancel_order(self, request: Request, pk: int) -> Response:
-        order, order_status = get_order_or_404(order_pk=pk)
+        order = get_order_or_404(order_pk=pk)
         if isinstance(order, Order):
-            permission_class = IsCustomerPermission()
-            has_object_permission = permission_class.has_object_permission(
-                request=request,
-                view=self.get_view_name(),
-                obj=order
-            )
-            if has_object_permission:
-                order.status = 'CANCELED'
-                order.save()
-                return Response(data={'order': 'Заказ был отменен'}, status=200)
-            else:
-                return Response(
-                    data={'detail': 'You do not have permission to perform this action.'},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-        return Response(data={'order': order}, status=order_status)
+            response_data, responses_status = cancel_order(order=order, request=request, view_name=self.get_view_name())
+            return Response(data=response_data, status=responses_status)
+        return Response(data={'order': 'Заказ не найден'}, status=order)
 
     def perform_create(self, serializer: OrderModelSerializer) -> None:
         serializer.validated_data['customer'] = self.request.user

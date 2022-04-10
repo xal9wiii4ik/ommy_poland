@@ -5,11 +5,14 @@ import fleep
 
 from math import radians, cos, sin, sqrt, asin
 
-from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 
+from rest_framework.request import Request
+
 from api.master.models import Master
+from api.order.permissions import IsCustomerPermission
 from api.order.tasks.order_notification.tasks import (
     send_notification_with_new_order_to_masters,
     send_masters_info_to_customer,
@@ -153,21 +156,20 @@ def create_order_files(order: Order, files: tp.List[tp.IO]) -> None:
         OrderFile.objects.create(order=order, bucket_path=bucket_path)
 
 
-def get_order_or_404(order_pk: int) -> tp.Tuple[tp.Union[Order, str], int]:
+def get_order_or_404(order_pk: int) -> tp.Union[Order, int]:
     """
     Get order or 404
     Args:
         order_pk: order pk
     Returns:
-        Order object
-        status
+        Order object or error message
     """
 
     try:
         order = Order.objects.get(pk=order_pk)
-        return order, 200
+        return order
     except Order.DoesNotExist:
-        return 'Заказ не найден', 404
+        return 404
 
 
 def add_master_to_order(order: Order, user: get_user_model) -> tp.Tuple[str, int]:
@@ -195,3 +197,28 @@ def add_master_to_order(order: Order, user: get_user_model) -> tp.Tuple[str, int
     order.status = OrderStatus.ACCEPTED.name
     order.save()
     return 'Вы приняли заказ, подробности заказа: тут подробности', 200
+
+
+def cancel_order(order: Order, request: Request, view_name: str) -> tp.Tuple[tp.Dict[str, str], int]:
+    """
+    Cancel order
+    Args:
+        order: Order
+        request: Request
+        view_name: view name
+    Returns:
+        response dict, response status
+    """
+
+    permission_class = IsCustomerPermission()
+    has_object_permission = permission_class.has_object_permission(
+        request=request,
+        view=view_name,
+        obj=order
+    )
+    if has_object_permission:
+        order.status = 'CANCELED'
+        order.save()
+        return {'order': 'Заказ был отменен'}, 200
+    else:
+        return {'detail': 'You do not have permission to perform this action.'}, 403
