@@ -85,7 +85,7 @@ class OrderModelViewSetTest(SetupAPITestCase):
 
     @mock.patch('api.order.tasks.order_notification.tasks.send_masters_notification_with_cancel_order.delay')
     @mock.patch('api.telegram_bot.tasks.notifications.tasks.send_cancel_order_to_order_chat.delay')
-    def test_cancel_order(self) -> None:
+    def test_cancel_order(self, *args: tp.Any) -> None:
         """
         Test case for cancel order
         """
