@@ -7,7 +7,7 @@ from math import radians, cos, sin, sqrt, asin
 
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 
 from rest_framework.request import Request
 
@@ -228,3 +228,24 @@ def cancel_order(order: Order, request: Request, view_name: str) -> tp.Tuple[tp.
         return {'order': 'Заказ был отменен'}, 200
     else:
         return {'detail': 'You do not have permission to perform this action.'}, 403
+
+
+def filter_order(req: Request, queryset: QuerySet):
+    """
+    Filter order
+    Args:
+        req: current request
+        queryset: current queryset
+    """
+
+    status = req.GET.get('status')
+    if status:
+        if status == 'active':
+            queryset = queryset.filter(Q(status=OrderStatus.ACCEPTED.name) |
+                                       Q(status=OrderStatus.IN_PROGRESS.name) |
+                                       Q(status=OrderStatus.OPEN.name))
+        else:
+            queryset = queryset.filter(Q(status=OrderStatus.DONE.name) |
+                                       Q(status=OrderStatus.CANCELED.name) |
+                                       Q(status=OrderStatus.PAID.name))
+    return queryset

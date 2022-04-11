@@ -1,13 +1,13 @@
 import typing as tp
-
 from datetime import timedelta
 
 from django.utils import timezone
+from django.db.models import F, Value
+from django.db.models.functions import Concat
 
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, JSONParser
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -20,8 +20,10 @@ from api.order.services import (
     create_order_files,
     master_exist_in_city,
     add_master_to_order,
+    get_order_or_404,
+    cancel_order,
+    filter_order,
     find_order_masters,
-    get_order_or_404, cancel_order,
 )
 from api.order.tasks.order_notification.tasks import send_search_master_status_to_customer
 from api.telegram_bot.tasks.notifications.tasks import (
@@ -30,16 +32,34 @@ from api.telegram_bot.tasks.notifications.tasks import (
 
 
 class OrderCreateOnlyViewSet(mixins.ListModelMixin,
+                             mixins.RetrieveModelMixin,
                              mixins.CreateModelMixin,
                              GenericViewSet):
     """
     View Set for create only order
     """
 
-    queryset = Order.objects.all()
+    queryset = Order.objects.prefetch_related('master').all().annotate(
+        customer_name=Concat('customer__first_name', Value(' '), 'customer__last_name'),
+        customer_phone_number=F('customer__phone_number'),
+    ).order_by('-id')
     serializer_class = OrderModelSerializer
     parser_classes = (MultiPartParser, JSONParser)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsCustomerPermission,)
+
+    def get_queryset(self):
+        return self.queryset.filter(customer=self.request.user)
+
+    def list(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
+        queryset = filter_order(req=request, queryset=self.get_queryset())
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def create(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
         # check if master exist in oder city

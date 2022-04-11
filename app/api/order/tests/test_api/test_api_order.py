@@ -5,6 +5,7 @@ import typing as tp
 from rest_framework import status
 from rest_framework.reverse import reverse
 
+from api.order.models import Order
 from api.utils.utils_tests.setup_tests import SetupAPITestCase
 
 
@@ -15,11 +16,54 @@ class OrderModelViewSetTest(SetupAPITestCase):
 
     def test_get_list(self) -> None:
         """
-        Test case for get list files
+        Test case for get list orders
         """
 
         url = reverse('order:order-list')
         self.client.credentials(HTTP_AUTHORIZATION=self.token_2)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Order.objects.filter(customer=self.user_2).count(), len(response.json()['results']))
+
+    def test_get_list_filter_active(self) -> None:
+        """
+        Test case for get list active orders
+        """
+
+        url = f'{reverse("order:order-list")}?status=active'
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_1)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(1, len(response.json()['results']))
+
+    def test_get_list_filter_not_active(self) -> None:
+        """
+        Test case for get list not active orders
+        """
+
+        url = f'{reverse("order:order-list")}?status=past'
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_1)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(2, len(response.json()['results']))
+
+    def test_get_retrieve_not_owner(self) -> None:
+        """
+        Test case for getting retrieve order not owner
+        """
+
+        url = reverse('order:order-detail', args=(self.order_1.pk,))
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_2)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_retrieve_owner(self) -> None:
+        """
+        Test case for getting retrieve order owner
+        """
+
+        url = reverse('order:order-detail', args=(self.order_1.pk,))
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_1)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
