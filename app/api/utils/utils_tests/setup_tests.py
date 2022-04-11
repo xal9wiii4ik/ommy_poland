@@ -109,6 +109,26 @@ class SetupAPITestCase(APITestCase):
             start_time=timezone.now(),
             customer=self.user_1
         )
+        self.order_1_paid = Order.objects.create(
+            number_employees=1,
+            desired_time_end_work='now',
+            status=OrderStatus.PAID.name,
+            city='Wroclaw',
+            longitude=20,
+            latitude=13,
+            start_time=timezone.now(),
+            customer=self.user_1
+        )
+        self.order_1_done = Order.objects.create(
+            number_employees=1,
+            desired_time_end_work='now',
+            status=OrderStatus.DONE.name,
+            city='Wroclaw',
+            longitude=20,
+            latitude=13,
+            start_time=timezone.now(),
+            customer=self.user_1
+        )
         self.order_1.master.add(self.master_1)
 
         self.order_2 = Order.objects.create(
