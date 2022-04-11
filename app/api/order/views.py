@@ -8,7 +8,6 @@ from django.db.models.functions import Concat
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, JSONParser
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -46,7 +45,7 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
     ).order_by('-id')
     serializer_class = OrderModelSerializer
     parser_classes = (MultiPartParser, JSONParser)
-    permission_classes = (IsAuthenticated, IsCustomerPermission,)
+    permission_classes = (IsCustomerPermission,)
 
     def get_queryset(self):
         return self.queryset.filter(customer=self.request.user)
