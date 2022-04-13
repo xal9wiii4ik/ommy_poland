@@ -28,7 +28,8 @@ class RegisterMasterApiView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer_data = serializer.data
 
-        create_master_account(data=serializer_data)
+        user_pk = create_master_account(data=serializer_data, master_experiences=request.data.get('master_experience'))
+        serializer_data.update({'user_pk': user_pk})
         return Response(data=serializer_data, status=status.HTTP_201_CREATED)
 
 
