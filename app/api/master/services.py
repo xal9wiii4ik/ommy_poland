@@ -4,13 +4,19 @@ from django.contrib.auth import get_user_model
 
 from api.authenticate.tasks.activate_user.tasks import send_phone_activate_message
 from api.master.models import Master
+from api.master.serializers import MasterExperienceModelSerializer
 
 
-def create_master_account(data: tp.Dict[str, tp.Any]):
+def create_master_account(
+        data: tp.Dict[str, tp.Any],
+        master_experiences: tp.List[tp.Dict[str, tp.Union[str, int]]]) -> int:
     """
     Create master account
     Args:
         data: user data
+        master_experiences: list with dict with master work experiences and work spheres
+    Return:
+        user pk
     """
 
     # create user account
@@ -28,11 +34,17 @@ def create_master_account(data: tp.Dict[str, tp.Any]):
     del data['password']
 
     # create master
-    Master.objects.create(
+    master = Master.objects.create(
         user=user,
-        work_experience=data['work_experience'],
         longitude=data['longitude'],
         latitude=data['latitude'],
         city=data['city'].lower()
     )
     send_phone_activate_message.delay(user.id)
+    if master_experiences is not None:
+        for master_experience in master_experiences:
+            serializer = MasterExperienceModelSerializer(data=master_experience)
+            if serializer.is_valid():
+                serializer.validated_data['master'] = master
+                serializer.save()
+    return user.pk

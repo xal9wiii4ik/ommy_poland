@@ -118,7 +118,7 @@ def find_order_masters(order_pk: int,
                 order_latitude=order_latitude,
                 master_longitude=master.longitude,
                 master_latitude=master.latitude
-            ), master.work_experience, 1, 1, 1, 1, 1.6]
+            ), 1, 1, 1, 1, 1, 1.6]
         )
 
     sort_masters_phone_numbers = generate_masters_queue(data=data, masters=masters)
