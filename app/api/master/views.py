@@ -12,8 +12,12 @@ from rest_framework.viewsets import GenericViewSet
 
 from api.master.models import Master, WorkSphere, MasterExperience
 from api.master.permissions import IsOwnerMasterPermission, IsOwnerMasterExperiencePermission
-from api.master.serializers import MasterModelSerializer, MasterRegisterSerializer, WorkSphereModelSerializer, \
-    MasterExperienceModelSerializer
+from api.master.serializers import (
+    MasterModelSerializer,
+    MasterRegisterSerializer,
+    WorkSphereModelSerializer,
+    MasterExperienceModelSerializer,
+)
 from api.master.services import create_master_account
 
 
