@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from api.account.serializers import UserRegisterSerializer
-from api.master.models import Master, MasterExperience
+from api.master.models import Master, MasterExperience, WorkSphere
 
 
 class MasterExperienceModelSerializer(serializers.ModelSerializer):
@@ -33,4 +33,14 @@ class MasterModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Master
+        fields = '__all__'
+
+
+class WorkSphereModelSerializer(serializers.ModelSerializer):
+    """
+    Model Serializer for model work sphere
+    """
+
+    class Meta:
+        model = WorkSphere
         fields = '__all__'
