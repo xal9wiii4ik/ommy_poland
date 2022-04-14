@@ -19,10 +19,8 @@ def activate_account(data: tp.Dict[str, tp.Any]) -> bool:
     except ObjectDoesNotExist:
         return False
     else:
-        # update user field
         user = activate_code.user
         user.is_active = True
         user.save()
-        # remove activate code
         activate_code.delete()
         return True

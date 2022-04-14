@@ -11,7 +11,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from api.authenticate.serializers import (
     CustomTokenObtainPairSerializer,
     ActivateAccountSerializer,
-    CookieTokenRefreshSerializer,
+    CookieTokenRefreshSerializer, CheckActivationCodeSerializer,
 )
 from api.authenticate.services import activate_account
 
@@ -66,3 +66,16 @@ class ActivateAccountApiView(APIView):
             return Response(data={'success': 'Account has been activated'}, status=status.HTTP_200_OK)
         return Response(data={'error': 'Account with this id and code does not exist'},
                         status=status.HTTP_400_BAD_REQUEST)
+
+
+class CheckActivationCode(APIView):
+    """
+    Check activation code(if he exist in db)
+    """
+
+    @swagger_auto_schema(request_body=CheckActivationCodeSerializer)
+    def post(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
+        serializer = CheckActivationCodeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer_data = serializer.data
+        return Response(data=serializer_data, status=status.HTTP_200_OK)

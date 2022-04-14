@@ -21,12 +21,12 @@ def send_phone_activate_message(user_pk: int) -> None:
 
     # create activate code
     user = get_user_model().objects.get(pk=user_pk)
-    activate_code = ActivateAccountCode.objects.create(user=user, code=random.randint(100000, 999999))
+    activate_code = ActivateAccountCode.objects.create(user=user, code=random.randint(1000, 9999))
 
     # send message to user
     client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
     _ = client.messages.create(
         to=user.phone_number,
         from_=settings.TWILIO_PHONE_NUMBER,
-        body=f'Your activation code: {activate_code.code}'
+        body=f'Ваш код подтверждения: {activate_code.code}'
     )

@@ -3,10 +3,11 @@ import typing as tp
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
-from ommy_polland import settings
+from api.authenticate.models import ActivateAccountCode
 
 
 class CookieTokenRefreshSerializer(TokenRefreshSerializer):
@@ -18,6 +19,7 @@ class CookieTokenRefreshSerializer(TokenRefreshSerializer):
 
     def validate(self, attrs):
         attrs['refresh'] = self.context['request'].COOKIES.get('refresh')
+        print(self.context['request'].COOKIES)
         if attrs['refresh']:
             return super().validate(attrs)
         else:
@@ -34,11 +36,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         user = get_user_model().objects.get(username=attrs['username'])
         data['fullname'] = f'{user.first_name} {user.last_name}'
-
-        data.update({
-            'expires_in': settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
-            'refresh_life_time': settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME']
-        })
         return data
 
 
@@ -48,4 +45,19 @@ class ActivateAccountSerializer(serializers.Serializer):
     """
 
     user_pk = serializers.IntegerField(required=True)
-    code = serializers.IntegerField(min_value=100000, max_value=999999)
+    code = serializers.IntegerField(min_value=1000, max_value=9999)
+
+
+class CheckActivationCodeSerializer(serializers.Serializer):
+    """
+    Serializer for checking activation code(if he exist in db)
+    """
+
+    code = serializers.IntegerField(min_value=1000, max_value=9999)
+
+    @staticmethod
+    def validate_code(code: int) -> int:
+        is_exist = ActivateAccountCode.objects.filter(code=code).exists()
+        if not is_exist:
+            raise ValidationError('Не верный код активации')
+        return code
