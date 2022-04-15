@@ -10,6 +10,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
+from api.authenticate.models import ActivateAccountCode
 from api.master.models import Master, WorkSphere
 from api.order.models import Order, OrderStatus
 from ommy_polland import settings
@@ -86,6 +87,11 @@ class SetupAPITestCase(APITestCase):
         token_data = self.client.post(path=url, data=json_data, content_type='application/json').data
         self.token_master_2 = f'Token ' \
                               f'{token_data["access"]}'
+        # setup activation codes
+        self.code_1 = ActivateAccountCode.objects.create(
+            user=self.user_1,
+            code=5962
+        )
         # setup work spheres
         self.work_sphere_1 = WorkSphere.objects.create(
             name='first'

@@ -58,7 +58,7 @@ class ActivateAccountAPITestCase(APITestCase):
             phone_number='+375292125976',
             is_active=False
         )
-        self.code = ActivateAccountCode.objects.create(user=self.user_1, code=123456)
+        self.code = ActivateAccountCode.objects.create(user=self.user_1, code=1234)
 
     def test_activate_account(self) -> None:
         """
@@ -78,3 +78,29 @@ class ActivateAccountAPITestCase(APITestCase):
         self.assertEqual(ActivateAccountCode.objects.all().count(), 0)
         self.user_1.refresh_from_db()
         self.assertTrue(self.user_1.is_active)
+
+    def test_check_activation_code_does_not_exist(self) -> None:
+        """
+        Test Check activation code does not exist
+        """
+
+        url = reverse('authenticate:check_activation_code')
+        data = {
+            'code': 1239
+        }
+        json_data = json.dumps(data)
+        response = self.client.post(url, data=json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_check_activation_code(self) -> None:
+        """
+        Test Check activation code
+        """
+
+        url = reverse('authenticate:check_activation_code')
+        data = {
+            'code': self.code.code
+        }
+        json_data = json.dumps(data)
+        response = self.client.post(url, data=json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
