@@ -1,12 +1,12 @@
 import typing as tp
 
-from django.contrib.auth import get_user_model, password_validation
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth import get_user_model
 from django.core.validators import validate_email
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from api.account.validations import password_validate, repeat_password_validate
 from api.authenticate.models import ActivateAccountCode
 
 
@@ -27,10 +27,10 @@ class UserRegisterSerializer(serializers.Serializer):
     def validate_phone_number(phone_number: str) -> str:
         if phone_number.find('+') == 0 and phone_number.replace('+', '').isdigit() and len(phone_number) == 13:
             if get_user_model().objects.filter(phone_number=phone_number):
-                raise serializers.ValidationError({'User with this phone number already exist'})
+                raise serializers.ValidationError('Пользователь с таким номером телефона уже заругистрирован')
             return phone_number
         else:
-            raise serializers.ValidationError({'Invalid phone number, example: +375*********'})
+            raise serializers.ValidationError('Неверный номер телефона, пример: +375*********')
 
     @staticmethod
     def validate_email(email: str) -> str:
@@ -38,19 +38,19 @@ class UserRegisterSerializer(serializers.Serializer):
             validate_email(value=email)
             accounts = get_user_model().objects.filter(email=email)
             if accounts:
-                raise serializers.ValidationError({'User with this email already exist'})
+                raise serializers.ValidationError('Пользователь с такой почтой уже зарегистрирован')
         return email
 
     @staticmethod
     def validate_password(password: str) -> str:
-        password_validation.validate_password(password=password)
-        return password
+        return password_validate(password=password)
 
     def validate(self, attrs: tp.Dict[str, tp.Any]) -> tp.Dict[str, tp.Any]:
-        if attrs.get('password') != attrs.get('repeat_password'):
-            raise serializers.ValidationError({'repeat_password': 'Repeat password should be equal to password'})
-        attrs['password'] = make_password(password=attrs['password'])
-        attrs['username'] = attrs.get('phone_number')
+        attrs['password'] = repeat_password_validate(
+            password=attrs['password'],
+            repeat_password=attrs['repeat_password']
+        )
+        attrs['username'] = attrs['phone_number']
         return attrs
 
 
@@ -92,8 +92,7 @@ class UpdatePasswordSerializer(serializers.Serializer):
 
     @staticmethod
     def validate_password(password: str) -> str:
-        password_validation.validate_password(password=password)
-        return password
+        return password_validate(password=password)
 
     def validate(self, attrs: tp.Dict[str, tp.Any]) -> tp.Dict[str, tp.Any]:
         activation_code = ActivateAccountCode.objects.filter(code=attrs['code'])
@@ -101,7 +100,8 @@ class UpdatePasswordSerializer(serializers.Serializer):
             raise ValidationError('Не верный код активации')
         attrs['user_pk'] = activation_code[0].user.pk
 
-        if attrs.get('password') != attrs.get('repeat_password'):
-            raise serializers.ValidationError({'repeat_password': 'Repeat password should be equal to password'})
-        attrs['password'] = make_password(password=attrs['password'])
+        attrs['password'] = repeat_password_validate(
+            password=attrs['password'],
+            repeat_password=attrs['repeat_password']
+        )
         return attrs

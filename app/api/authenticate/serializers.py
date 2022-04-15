@@ -11,15 +11,12 @@ from api.authenticate.models import ActivateAccountCode
 
 
 class CookieTokenRefreshSerializer(TokenRefreshSerializer):
-    """
-    Custom serializer for refresh token
-    """
+    """ Custom serializer for refresh token """
 
     refresh = None
 
     def validate(self, attrs):
         attrs['refresh'] = self.context['request'].COOKIES.get('refresh')
-        print(self.context['request'].COOKIES)
         if attrs['refresh']:
             return super().validate(attrs)
         else:
@@ -39,19 +36,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
-class ActivateAccountSerializer(serializers.Serializer):
-    """
-    Serializer for activate account
-    """
-
-    user_pk = serializers.IntegerField(required=True)
-    code = serializers.IntegerField(min_value=1000, max_value=9999)
-
-
 class CheckActivationCodeSerializer(serializers.Serializer):
-    """
-    Serializer for checking activation code(if he exist in db)
-    """
+    """ Serializer for checking activation code(if he exist in db) """
 
     code = serializers.IntegerField(min_value=1000, max_value=9999)
 
@@ -61,3 +47,9 @@ class CheckActivationCodeSerializer(serializers.Serializer):
         if not is_exist:
             raise ValidationError('Не верный код активации')
         return code
+
+
+class ActivateAccountSerializer(CheckActivationCodeSerializer):
+    """ Serializer for activate account """
+
+    user_pk = serializers.IntegerField(required=True)

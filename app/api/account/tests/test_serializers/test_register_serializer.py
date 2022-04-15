@@ -23,7 +23,28 @@ class RegisterUserTestCase(SetupAPITestCase):
             serializer.is_valid(raise_exception=True)
         except ValidationError as e:
             expected_exception = {
-                'phone_number': [ErrorDetail(string="{'User with this phone number already exist'}", code='invalid')]
+                'phone_number': [ErrorDetail(
+                    string='Пользователь с таким номером телефона уже заругистрирован',
+                    code='invalid'
+                )]
+            }
+            self.assertEqual(expected_exception, e.detail)
+
+    def test_invalid_password(self) -> None:
+        try:
+            data = {
+                'password': 'aksjdakmdl2фыв',
+                'repeat_password': 'aksjdakmdl2фыв',
+                'email': 'some@email.ru',
+                'first_name': 'first_name',
+                'last_name': 'last_name',
+                'phone_number': '+375292105978'
+            }
+            serializer = UserRegisterSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            expected_exception = {
+                'password': [ErrorDetail(string='Пароль должен содержать латинские буквы и цыфры', code='invalid')]
             }
             self.assertEqual(expected_exception, e.detail)
 
@@ -41,7 +62,7 @@ class RegisterUserTestCase(SetupAPITestCase):
             serializer.is_valid(raise_exception=True)
         except ValidationError as e:
             expected_exception = {
-                'phone_number': [ErrorDetail(string="{'Invalid phone number, example: +375*********'}", code='invalid')]
+                'phone_number': [ErrorDetail(string='Неверный номер телефона, пример: +375*********', code='invalid')]
             }
             self.assertEqual(expected_exception, e.detail)
 
@@ -59,7 +80,7 @@ class RegisterUserTestCase(SetupAPITestCase):
             serializer.is_valid(raise_exception=True)
         except ValidationError as e:
             expected_exception = {
-                'email': [ErrorDetail(string="{'User with this email already exist'}", code='invalid')]
+                'email': [ErrorDetail(string='Пользователь с такой почтой уже зарегистрирован', code='invalid')]
             }
             self.assertEqual(expected_exception, e.detail)
 
@@ -95,7 +116,7 @@ class RegisterUserTestCase(SetupAPITestCase):
             serializer.is_valid(raise_exception=True)
         except ValidationError as e:
             expected_exception = {
-                'repeat_password': [ErrorDetail(string='Repeat password should be equal to password', code='invalid')]
+                'repeat_password': [ErrorDetail(string='repeat_password должен быть равен password', code='invalid')]
             }
             self.assertEqual(expected_exception, e.detail)
 

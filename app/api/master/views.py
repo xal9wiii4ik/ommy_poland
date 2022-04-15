@@ -19,6 +19,7 @@ from api.master.serializers import (
     MasterExperienceModelSerializer,
 )
 from api.master.services import create_master_account
+from api.utils.services import get_serializer_data
 
 
 class RegisterMasterApiView(APIView):
@@ -30,9 +31,7 @@ class RegisterMasterApiView(APIView):
 
     @swagger_auto_schema(request_body=MasterRegisterSerializer)
     def post(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
-        serializer = MasterRegisterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer_data = serializer.data
+        serializer_data = get_serializer_data(data=request.data, serializer=MasterRegisterSerializer)
 
         user_pk = create_master_account(data=serializer_data, master_experiences=request.data.get('master_experience'))
         serializer_data.update({'user_pk': user_pk})

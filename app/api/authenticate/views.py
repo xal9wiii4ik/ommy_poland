@@ -11,11 +11,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from api.authenticate.serializers import (
     CustomTokenObtainPairSerializer,
     ActivateAccountSerializer,
-    CookieTokenRefreshSerializer, CheckActivationCodeSerializer,
+    CookieTokenRefreshSerializer,
+    CheckActivationCodeSerializer,
 )
 from api.authenticate.services import activate_account
-
-from ommy_polland import settings
+from api.utils.services import get_serializer_data, set_refresh_to_cookie
 
 
 class CookieTokenObtainPairView(TokenObtainPairView):
@@ -26,11 +26,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
     def finalize_response(self, request: Request, response: Response, *args, **kwargs):
-        if response.data.get('refresh'):
-            cookie_max_age = 60 * settings.REFRESH_TOKEN_LIFETIME
-            response.set_cookie('refresh', response.data['refresh'], max_age=cookie_max_age, httponly=True,
-                                samesite='None', secure=True)
-            del response.data['refresh']
+        set_refresh_to_cookie(response=response)
         return super().finalize_response(request, response, *args, **kwargs)
 
 
@@ -42,11 +38,7 @@ class CookieTokenRefreshView(TokenRefreshView):
     serializer_class = CookieTokenRefreshSerializer
 
     def finalize_response(self, request: Request, response: Response, *args, **kwargs):
-        if response.data.get('refresh'):
-            cookie_max_age = 60 * settings.REFRESH_TOKEN_LIFETIME
-            response.set_cookie('refresh', response.data['refresh'], max_age=cookie_max_age, httponly=True,
-                                samesite='None', secure=True)
-            del response.data['refresh']
+        set_refresh_to_cookie(response=response)
         return super().finalize_response(request, response, *args, **kwargs)
 
 
@@ -57,9 +49,7 @@ class ActivateAccountApiView(APIView):
 
     @swagger_auto_schema(request_body=ActivateAccountSerializer)
     def post(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
-        serializer = ActivateAccountSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer_data = serializer.data
+        serializer_data = get_serializer_data(data=request.data, serializer=ActivateAccountSerializer)
 
         is_activated = activate_account(data=serializer_data)
         if is_activated:
@@ -75,7 +65,5 @@ class CheckActivationCode(APIView):
 
     @swagger_auto_schema(request_body=CheckActivationCodeSerializer)
     def post(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
-        serializer = CheckActivationCodeSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer_data = serializer.data
+        serializer_data = get_serializer_data(data=request.data, serializer=CheckActivationCodeSerializer)
         return Response(data=serializer_data, status=status.HTTP_200_OK)
