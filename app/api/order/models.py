@@ -31,12 +31,19 @@ class OrderStatus(Enum):
     Enums with order statuses
     """
 
-    OPEN = 'open'
-    ACCEPTED = 'accepted'
-    IN_PROGRESS = 'in_progress'
-    DONE = 'done'
-    PAID = 'paid'
-    CANCELED = 'canceled'
+    SEARCH_MASTER = 'Поиск мастера'
+    AWAIT_EXECUTING = 'Ожидает выполнения'
+    CANCELED = 'Заявка отменена'
+    PAID = 'Оплачено'
+
+
+class OrderMasterStatusChoices(Enum):
+    """ Enums for order status for masters """
+
+    REJECTED = 'Заявка отклонена'
+    CUSTOMER_CANCELED = 'Заявка отменена клиентом'
+    MASTER_CANCELED = 'Заявка отменена мастером'
+    ACCEPTED = 'Заявка принята'
 
 
 class WorkSphere(models.Model):
@@ -82,7 +89,7 @@ class Order(models.Model):
     status = models.CharField(
         max_length=30,
         choices=[(order_status.name, order_status.value) for order_status in OrderStatus],
-        default=OrderStatus.OPEN.value
+        default=OrderStatus.SEARCH_MASTER.value
     )
     longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='longitude in degrees')
     latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='latitude in degrees')
@@ -104,6 +111,30 @@ class Order(models.Model):
         return f'pk: {self.pk}, name: {self.name}, address: {self.address}, ' \
                f'date_created: {self.date_created}, ' \
                f'status: {self.status}, work_sphere: {self.work_sphere}'
+
+
+class OrderMasterStatus(models.Model):
+    """ Model for table order status for masters """
+
+    order = models.ForeignKey(
+        to=Order,
+        verbose_name='Order for master status',
+        related_name='order_master_status',
+        on_delete=models.CASCADE
+    )
+    master = models.ForeignKey(
+        to=Master,
+        verbose_name='Master for order status',
+        related_name='master_order_status',
+        on_delete=models.CASCADE
+    )
+    status = models.CharField(
+        max_length=30,
+        choices=[(order_status.name, order_status.value) for order_status in OrderMasterStatusChoices]
+    )
+
+    def __str__(self) -> str:
+        return f'pk: {self.pk}, order: {self.order.pk}, master: {self.master.pk}, status: {self.status}'
 
 
 class OrderFile(models.Model):

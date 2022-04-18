@@ -5,7 +5,14 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe, SafeString
 
-from api.order.models import Order, OrderFile
+from api.order.models import Order, OrderFile, OrderMasterStatus
+
+
+@admin.register(OrderMasterStatus)
+class OrderMasterStatusModelAdmin(admin.ModelAdmin):
+    """
+    Display model OrderMasterStatus in admin panel
+    """
 
 
 @admin.register(Order)

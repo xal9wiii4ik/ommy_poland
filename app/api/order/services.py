@@ -18,7 +18,7 @@ from api.order.tasks.order_notification.tasks import (
     send_masters_info_to_customer,
     send_masters_notification_with_cancel_order,
 )
-from api.order.models import Order, OrderFile, OrderStatus
+from api.order.models import Order, OrderFile, OrderStatus, OrderMasterStatus, OrderMasterStatusChoices
 from api.telegram_bot.tasks.notifications.tasks import send_cancel_order_to_order_chat
 from api.utils.search_masters.eval import MasterComplianceAssessment
 
@@ -125,7 +125,7 @@ def find_order_masters(order_pk: int,
 
     start_time = timezone.now()
     send_notification_with_new_order_to_masters.delay(order_pk, sort_masters_phone_numbers, start_time)
-    return {'success': f'Мы нашли {len(sort_masters_phone_numbers)} подходящих мастеров для вашего'}
+    return {'success': f'Мы нашли {len(sort_masters_phone_numbers)} подходящих мастеров для вашего заказа'}
 
 
 def create_order_files(order: Order, files: tp.List[tp.IO]) -> None:
@@ -174,6 +174,20 @@ def get_order_or_404(order_pk: int) -> tp.Union[Order, int]:
         return 404
 
 
+def update_order_master_statuses(order: Order, status: str):
+    """
+    Updating the order status for the masters
+    Args:
+         order: order pk
+         status: current status for masters
+    """
+
+    order_master_statuses = OrderMasterStatus.objects.filter(order=order)
+    for order_master_status in order_master_statuses:
+        order_master_status.status = status
+        order_master_status.save()
+
+
 def add_master_to_order(order: Order, user: get_user_model) -> tp.Tuple[str, int]:
     """
     Add master to order
@@ -188,17 +202,32 @@ def add_master_to_order(order: Order, user: get_user_model) -> tp.Tuple[str, int
 
     if order.number_employees <= order.master.all().count():
         return 'Мы уже нашли достаточное кол-во мастеров для этого заказа', 400
-    order.master.add(user.master)
 
-    if order.status == 'CANCELED':
+    if order.status == OrderStatus.CANCELED.name:
         return 'К сожелению заказ был отменен, ожидайте остальные заказы', 400
+
+    order.master.add(user.master)
 
     if order.number_employees == order.master.all().count():
         send_masters_info_to_customer.delay(order_pk)
 
-    order.status = OrderStatus.ACCEPTED.name
-    order.save()
+    order_master_status = OrderMasterStatus.objects.get_or_create(order=order, master=user.master)
+    order_master_status.status = OrderMasterStatusChoices.ACCEPTED.name
+    order_master_status.save()
+    # TODO update
+    # order.status = OrderStatus.ACCEPTED.name
+    # order.save()
     return 'Вы приняли заказ, подробности заказа: тут подробности', 200
+
+
+def order_reject(order_pk: int) -> None:
+    """
+    Update status for order for master
+    Args:
+        order_pk: order pk
+    """
+
+    OrderMasterStatus.objects.filter(order__pk=order_pk).update(status=OrderMasterStatusChoices.REJECTED.name)
 
 
 def cancel_order(order: Order, request: Request, view_name: str) -> tp.Tuple[tp.Dict[str, str], int]:
@@ -219,7 +248,7 @@ def cancel_order(order: Order, request: Request, view_name: str) -> tp.Tuple[tp.
         obj=order
     )
     if has_object_permission:
-        order.status = 'CANCELED'
+        order.status = OrderStatus.CANCELED.name
         order.save()
 
         send_masters_notification_with_cancel_order.delay(order.pk)
@@ -240,12 +269,11 @@ def filter_order(req: Request, queryset: QuerySet):
 
     status = req.GET.get('status')
     if status:
+        # TODO update
         if status == 'active':
-            queryset = queryset.filter(Q(status=OrderStatus.ACCEPTED.name) |
-                                       Q(status=OrderStatus.IN_PROGRESS.name) |
-                                       Q(status=OrderStatus.OPEN.name))
+            queryset = queryset.filter(Q(status=OrderStatus.SEARCH_MASTER.name) |
+                                       Q(status=OrderStatus.AWAIT_EXECUTING.name))
         else:
-            queryset = queryset.filter(Q(status=OrderStatus.DONE.name) |
-                                       Q(status=OrderStatus.CANCELED.name) |
+            queryset = queryset.filter(Q(status=OrderStatus.CANCELED.name) |
                                        Q(status=OrderStatus.PAID.name))
     return queryset

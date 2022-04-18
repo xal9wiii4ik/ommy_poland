@@ -23,7 +23,7 @@ from api.order.services import (
     get_order_or_404,
     cancel_order,
     filter_order,
-    find_order_masters,
+    find_order_masters, order_reject,
 )
 from api.order.tasks.order_notification.tasks import send_search_master_status_to_customer
 from api.telegram_bot.tasks.notifications.tasks import (
@@ -112,6 +112,14 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
             response_message, response_status = add_master_to_order(order=order, user=request.user)
             return Response(data={'master': response_message}, status=response_status)
         return Response(data={'order': 'Заказ не найден'}, status=order)
+
+    @action(detail=True,
+            methods=['PATCH'],
+            permission_classes=[IsMasterPermission],
+            url_path=r'reject_order')
+    def reject_order(self, request: Request, pk: int) -> Response:
+        order_reject(order_pk=pk)
+        return Response(data={'status': 'Вы отклонили заявку'}, status=status.HTTP_200_OK)
 
     @action(detail=True,
             methods=['PATCH'],

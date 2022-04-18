@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from api.master.models import Master
-from api.order.models import Order, OrderFile
+from api.order.models import Order, OrderFile, OrderMasterStatus
 
 
 class OrderImageModelSerializer(serializers.ModelSerializer):
@@ -15,9 +15,7 @@ class OrderImageModelSerializer(serializers.ModelSerializer):
 
 
 class OrderMasterModelSerializer(serializers.ModelSerializer):
-    """
-    Model serializer for order masters
-    """
+    """ Model serializer for order masters """
 
     phone_number = serializers.CharField(source='user.phone_number', read_only=True)
     full_name = serializers.SerializerMethodField(read_only=True)
@@ -33,10 +31,16 @@ class OrderMasterModelSerializer(serializers.ModelSerializer):
         fields = ['phone_number', 'full_name']
 
 
+class OrderMasterStatusModelSerializer(serializers.ModelSerializer):
+    """ Model Serializer for model OrderMasterStatus """
+
+    class Meta:
+        model = OrderMasterStatus
+        fields = '__all__'
+
+
 class OrderModelSerializer(serializers.ModelSerializer):
-    """
-    Model Serializer for model Order
-    """
+    """ Model Serializer for model Order """
 
     order_files = OrderImageModelSerializer(many=True, read_only=True)
     city = serializers.CharField(max_length=100, write_only=True)

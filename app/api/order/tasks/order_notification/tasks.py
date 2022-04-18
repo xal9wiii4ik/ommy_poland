@@ -69,9 +69,10 @@ def send_masters_info_to_customer(order_pk: int) -> None:
         order_pk: order pk
     """
 
-    from api.order.models import Order
+    from api.order.models import Order, OrderStatus
 
     order = Order.objects.get(pk=order_pk)
+    order.status = OrderStatus.AWAIT_EXECUTING.name
     masters = order.master.all()
 
     message = 'Мастер(а) найден(ы)\n' \
@@ -101,7 +102,7 @@ def send_search_master_status_to_customer(order_pk: int, current_time: str):
     number_employees = order.number_employees
     current_datetime = datetime.strptime(current_time, '%Y-%m-%dT%H:%M:%S.%f%z')
     link = 'link_here'
-    if number_employees < order_masters_count and order.status != 'CANCELED':
+    if number_employees < order_masters_count and order.status != 'ORDER_CUSTOMER_CANCELED':
         if current_datetime < order.start_time:
             message = f'Продолжается поиск мастеров.\n' \
                       f'Вы можете следить за статусом заявки на странице “Заявка”,\n' \
@@ -124,11 +125,15 @@ def send_masters_notification_with_cancel_order(order_pk: int) -> None:
         order_pk: order pk
     """
 
-    from api.order.models import Order
+    from api.order.models import Order, OrderStatus, OrderMasterStatusChoices
+    from api.order.services import update_order_master_statuses
 
     client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
 
     order = Order.objects.get(pk=order_pk)
+    order.status = OrderStatus.CANCELED.name
+    update_order_master_statuses(order=order, status=OrderMasterStatusChoices.CUSTOMER_CANCELED.name)
+
     order_masters = order.master.all()
 
     message = f'Заказ {order.name}, по адресу {order.address} был отменен'
