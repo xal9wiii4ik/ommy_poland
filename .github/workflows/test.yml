@@ -47,6 +47,9 @@ jobs:
           echo TWILIO_ACCOUNT_SID=${{ secrets.TWILIO_ACCOUNT_SID }} >> .env
           echo TWILIO_AUTH_TOKEN=${{ secrets.TWILIO_AUTH_TOKEN }} >> .env
           echo TWILIO_PHONE_NUMBER=${{ secrets.TWILIO_PHONE_NUMBER }} >> .env
+      - name: create .env file
+        run: |
+          touch service_account.json
       - name: create .env.db file
         run: |
           echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env.db

@@ -210,6 +210,10 @@ TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')  # type: ignore
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')  # type: ignore
 TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')  # type: ignore
 
+# GOOGLE SHEETS
+SHEET = os.environ.get('SHEET')
+WORK_SHEET = os.environ.get('WORK_SHEET')
+
 # STATIC FILES
 STATIC_URL = "/staticfiles/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")

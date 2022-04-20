@@ -1,13 +1,12 @@
-from enum import Enum
-
 import fleep
 
+from enum import Enum
 
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
-from api.master.models import Master
+from api.master.models import Master, WorkSphere
 
 
 def get_file_type(file_bytes: bytes) -> str:
@@ -37,17 +36,6 @@ class OrderStatus(Enum):
     DONE = 'done'
     PAID = 'paid'
     CANCELED = 'canceled'
-
-
-class WorkSphere(models.Model):
-    """
-    Model for table work sphere
-    """
-
-    name = models.CharField(max_length=100, verbose_name='work sphere')
-
-    def __str__(self) -> str:
-        return f'pk: {self.pk}, name: {self.name}'
 
 
 class Order(models.Model):
