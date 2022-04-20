@@ -1,11 +1,8 @@
 import typing as tp
-from datetime import timedelta
 
-from django.utils import timezone
 from django.db.models import F, Value
 from django.db.models.functions import Concat
 
-from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.parsers import MultiPartParser, JSONParser
 from rest_framework.request import Request
@@ -18,14 +15,12 @@ from api.order.serializers import OrderModelSerializer
 from api.order.models import Order
 from api.order.services import (
     create_order_files,
-    master_exist_in_city,
     add_master_to_order,
     get_order_or_404,
     cancel_order,
     filter_order,
-    find_order_masters,
 )
-from api.order.tasks.order_notification.tasks import send_search_master_status_to_customer
+from api.order.tasks.order_notification.tasks import update_order_google_sheet
 from api.telegram_bot.tasks.notifications.tasks import (
     send_notification_with_new_order_to_order_chat,
 )
@@ -63,14 +58,14 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
 
     def create(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
         # check if master exist in oder city
-        if request.data.get('city') is None:
-            return Response(data={'city': 'Field is required'}, status=status.HTTP_400_BAD_REQUEST)
-        masters = master_exist_in_city(city=request.data['city'])
-        if not masters:
-            return Response(
-                data={'masters': 'У нас пока что нет мастеров в вашем городе'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # if request.data.get('city') is None:
+        #     return Response(data={'city': 'Field is required'}, status=status.HTTP_400_BAD_REQUEST)
+        # masters = master_exist_in_city(city=request.data['city'])
+        # if not masters:
+        #     return Response(
+        #         data={'masters': 'У нас пока что нет мастеров в вашем городе'},
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
 
         # create order and order file and send notification
         response = super(OrderCreateOnlyViewSet, self).create(request, *args, **kwargs)
@@ -81,18 +76,25 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
             create_order_files(files=self.request.FILES.pop('files'),
                                order=order)
 
+        order.refresh_from_db()
+        print(order.pk)
+        update_order_google_sheet.delay(order.pk)
+
         send_notification_with_new_order_to_order_chat.delay(response.data['id'])
 
-        current_time = timezone.now()
-        status_execute_time = current_time + timedelta(minutes=30)
-        send_search_master_status_to_customer.apply_async(eta=status_execute_time, args=(order.pk, status_execute_time))
+        # TODO
 
-        # create queue and send notifications to masters
-        masters_queue_info = find_order_masters(order_pk=response.data['id'],
-                                                order_longitude=float(request.data['longitude']),
-                                                order_latitude=float(request.data['latitude']),
-                                                masters=masters)
-        response.data.update(masters_queue_info)
+        # current_time = timezone.now()
+        # status_execute_time = current_time + timedelta(minutes=30)
+        # send_search_master_status_to_customer.apply_async(eta=status_execute_time, args=(
+        # order.pk, status_execute_time))
+        #
+        # # create queue and send notifications to masters
+        # masters_queue_info = find_order_masters(order_pk=response.data['id'],
+        #                                         order_longitude=float(request.data['longitude']),
+        #                                         order_latitude=float(request.data['latitude']),
+        #                                         masters=masters)
+        # response.data.update(masters_queue_info)
 
         # TODO update or remove
         # # send coming notification if start time not now

@@ -1,3 +1,4 @@
+import gspread
 import typing as tp
 
 from datetime import timedelta, datetime
@@ -139,3 +140,51 @@ def send_masters_notification_with_cancel_order(order_pk: int) -> None:
             from_=settings.TWILIO_PHONE_NUMBER,
             body=message
         )
+
+
+@shared_task
+def update_order_google_sheet(order_pk: int):
+    """
+    Update google sheet with new order
+    Args:
+        order_pk: order_pk
+    """
+
+    from django.db.models import F, FloatField, Sum
+    from api.order.models import Order
+    from api.order.serializers import GoogleSheetOrderSerializer
+
+    service_account = gspread.service_account()
+    sheet = service_account.open(settings.SHEET)
+
+    work_sheet = sheet.worksheet(settings.WORK_SHEET)
+
+    # TODO update commission
+    order = Order.objects.select_related('customer').select_related('work_sphere').annotate(
+        phone_number=F('customer__phone_number'),
+        work_sphere_name=F('work_sphere__name'),
+        commission=Sum(F('price') * 0.2, output_field=FloatField())
+    ).get(pk=order_pk)
+
+    serializer = GoogleSheetOrderSerializer(order)
+    serializer_data = serializer.data
+
+    count_columns = len(work_sheet.get_all_values())
+    current_column = count_columns + 1
+
+    columns_name = 'ABCDEFGHIJKL'
+    update_keys = ['date_created', 'start_time']
+
+    for index, key in enumerate(serializer_data.keys()):
+        if key == 'order_files':
+            additional_columns = 0
+            for file in serializer_data[key]:
+                work_sheet.update(f'{columns_name[index]}{current_column + additional_columns}', file['bucket_path'])
+                additional_columns += 1
+        else:
+            value = serializer_data[key]
+            if key in update_keys:
+                value = value.replace('T', ' ').split(".")[0].split('+')[0]
+            work_sheet.update(f'{columns_name[index]}{current_column}', value)
+
+    work_sheet.columns_auto_resize(0, 12)
