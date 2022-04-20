@@ -12,6 +12,7 @@ RUN apt install -y netcat
 
 RUN pip3 install --upgrade pip
 COPY ./app .
+
 RUN mkdir ~/.config
 RUN mkdir ~/.config/gspread
 COPY service_account.json .

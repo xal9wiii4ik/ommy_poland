@@ -12,6 +12,11 @@ RUN apt install -y netcat
 RUN pip3 install --upgrade pip
 COPY ./ommy_poland/app .
 
+RUN mkdir ~/.config
+RUN mkdir ~/.config/gspread
+COPY ./ommy_poland/service_account.json .
+RUN mv service_account.json ~/.config/gspread/service_account.json
+
 RUN pip3 install -r ./requirements.txt
 
 RUN chmod +x ./entrypoints/web_entrypoint.sh
