@@ -77,7 +77,6 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
                                order=order)
 
         order.refresh_from_db()
-        print(order.pk)
         update_order_google_sheet.delay(order.pk)
 
         send_notification_with_new_order_to_order_chat.delay(response.data['id'])
