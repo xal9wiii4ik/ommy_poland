@@ -14,25 +14,34 @@ def send_notification_with_new_order_to_order_chat(order_pk: int) -> None:
         order_pk: current order pk
     """
 
+    from django.db.models import F
     from api.order.models import Order
     from api.telegram_bot.loader import dp
+    from api.order.serializers import GoogleSheetOrderSerializer
 
     logging.info(f'Start send notification to ommy chat with new order: {order_pk}')
 
-    order = Order.objects.get(pk=order_pk)
+    order = Order.objects.select_related('customer').select_related('work_sphere').annotate(
+        phone_number=F('customer__phone_number'),
+        work_sphere_name=F('work_sphere__name'),
+        first_name=F('customer__first_name'),
+    ).get(pk=order_pk)
+    serializer = GoogleSheetOrderSerializer(order)
+    serializer_data = serializer.data
+
     message = f'New order with pk: {order.pk} has been created\n' \
               f'========Order info========\n' \
+              f'Work_sphere: {serializer_data["work_sphere_name"]}\n' \
               f'Order name: {order.name}\n' \
-              f'Number Employees: {order.number_employees}\n' \
+              f'Work duration: {order.number_employees}\n' \
               f'Desired time end work: {order.desired_time_end_work}\n' \
-              f'Start work time: {order.start_time}\n' \
-              f'Price: {order.price}\n' \
+              f'Start work time: {serializer_data["start_time"]}\n' \
+              f'Price: {order.price} BYN\n' \
               f'Description: {order.description}\n' \
               f'Address: {order.address}\n' \
               f'========Customer info========\n' \
               f'Phone number: {order.customer.phone_number}\n' \
-              f'First name: {order.customer.first_name}\n' \
-              f'Last name: {order.customer.last_name}\n'
+              f'First name: {order.customer.first_name}\n'
     dp.loop.run_until_complete(dp.bot.send_message(chat_id=settings.ORDER_CHAT_ID, text=message))
 
     send_files_for_notifications(order=order, chat_id=settings.ORDER_CHAT_ID)
