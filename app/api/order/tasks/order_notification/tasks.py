@@ -150,7 +150,7 @@ def update_order_google_sheet(order_pk: int):
         order_pk: order_pk
     """
 
-    from django.db.models import F, FloatField, Sum
+    from django.db.models import F
     from api.order.models import Order
     from api.order.serializers import GoogleSheetOrderSerializer
 
@@ -163,7 +163,7 @@ def update_order_google_sheet(order_pk: int):
     order = Order.objects.select_related('customer').select_related('work_sphere').annotate(
         phone_number=F('customer__phone_number'),
         work_sphere_name=F('work_sphere__name'),
-        commission=Sum(F('price') * 0.2, output_field=FloatField())
+        first_name=F('customer__first_name'),
     ).get(pk=order_pk)
 
     serializer = GoogleSheetOrderSerializer(order)
@@ -173,7 +173,6 @@ def update_order_google_sheet(order_pk: int):
     current_column = count_columns + 1
 
     columns_name = 'ABCDEFGHIJKL'
-    update_keys = ['date_created', 'start_time']
 
     for index, key in enumerate(serializer_data.keys()):
         if key == 'order_files':
@@ -182,9 +181,6 @@ def update_order_google_sheet(order_pk: int):
                 work_sheet.update(f'{columns_name[index]}{current_column + additional_columns}', file['bucket_path'])
                 additional_columns += 1
         else:
-            value = serializer_data[key]
-            if key in update_keys:
-                value = value.replace('T', ' ').split(".")[0].split('+')[0]
-            work_sheet.update(f'{columns_name[index]}{current_column}', value)
+            work_sheet.update(f'{columns_name[index]}{current_column}', serializer_data[key])
 
-    work_sheet.columns_auto_resize(0, 12)
+    work_sheet.columns_auto_resize(0, 14)

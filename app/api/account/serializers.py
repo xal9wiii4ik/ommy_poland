@@ -19,7 +19,7 @@ class UserRegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=100, required=False)
     phone_number = serializers.CharField(max_length=13, required=True)
     first_name = serializers.CharField(max_length=100, required=True)
-    last_name = serializers.CharField(max_length=100, required=True)
+    last_name = serializers.CharField(max_length=100, required=False)
     password = serializers.CharField(max_length=100, required=True)
     repeat_password = serializers.CharField(max_length=100, required=True)
 
