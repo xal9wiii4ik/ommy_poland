@@ -50,8 +50,8 @@ class GoogleSheetOrderSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(max_length=13, read_only=True)
     work_sphere_name = serializers.CharField(max_length=13, read_only=True)
     order_files = OrderImageModelSerializer(many=True, read_only=True)
-    start_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
-    date_created = serializers.DateTimeField(format='%Y-%m-%d %H:%M')
+    start_time = serializers.DateTimeField(format='%d-%m-%Y %H:%M')
+    date_created = serializers.DateTimeField(format='%d-%m-%Y %H:%M')
     first_name = serializers.CharField(max_length=150)
 
     class Meta:
@@ -59,4 +59,4 @@ class GoogleSheetOrderSerializer(serializers.ModelSerializer):
         fields = ['date_created', 'phone_number', 'first_name', 'work_sphere_name',
                   'number_employees', 'desired_time_end_work', 'start_time',
                   'address', 'description', 'order_files',
-                  'status', 'price']
+                  'price', 'status']

@@ -7,6 +7,9 @@ class ActivateAccountCode(models.Model):
     Model which contain user account and codes for activating this accounts
     """
 
+    class Meta:
+        verbose_name = 'Activate Account Code'
+
     user = models.ForeignKey(to=get_user_model(),
                              related_name='activate_code_user',
                              on_delete=models.CASCADE,

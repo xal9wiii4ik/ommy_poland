@@ -172,7 +172,15 @@ def update_order_google_sheet(order_pk: int):
     count_columns = len(work_sheet.get_all_values())
     current_column = count_columns + 1
 
-    columns_name = 'ABCDEFGHIJKL'
+    columns_name = 'BCDEFGHIJKLM'
+
+    order_number = None
+    for value in reversed(work_sheet.col_values(1)):
+        if value.isnumeric():
+            order_number = int(value) + 1
+            break
+
+    work_sheet.update(f'A{current_column}', order_number if order_number is not None else 1)
 
     for index, key in enumerate(serializer_data.keys()):
         if key == 'order_files':

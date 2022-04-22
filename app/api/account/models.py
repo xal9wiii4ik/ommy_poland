@@ -9,6 +9,7 @@ class User(AbstractUser):
 
     class Meta:
         abstract = False
+        verbose_name = 'Client'
 
     phone_number = models.CharField(verbose_name='Phone Number', max_length=13, unique=True)
     address = models.CharField(verbose_name='address',

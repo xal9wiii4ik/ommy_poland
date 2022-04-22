@@ -111,6 +111,7 @@ class SetupAPITestCase(APITestCase):
 
         # setup orders
         self.order_1 = Order.objects.create(
+            name='order_1',
             number_employees=1,
             desired_time_end_work='now',
             status=OrderStatus.OPEN.name,
@@ -118,9 +119,11 @@ class SetupAPITestCase(APITestCase):
             longitude=20,
             latitude=13,
             start_time=timezone.now(),
-            customer=self.user_1
+            customer=self.user_1,
+            price=20,
         )
         self.order_1_paid = Order.objects.create(
+            name='order_1_paid',
             number_employees=1,
             desired_time_end_work='now',
             status=OrderStatus.PAID.name,
@@ -128,9 +131,11 @@ class SetupAPITestCase(APITestCase):
             longitude=20,
             latitude=13,
             start_time=timezone.now(),
-            customer=self.user_1
+            customer=self.user_1,
+            price=20,
         )
         self.order_1_done = Order.objects.create(
+            name='order_1_done',
             number_employees=1,
             desired_time_end_work='now',
             status=OrderStatus.DONE.name,
@@ -138,11 +143,13 @@ class SetupAPITestCase(APITestCase):
             longitude=20,
             latitude=13,
             start_time=timezone.now(),
-            customer=self.user_1
+            customer=self.user_1,
+            price=20,
         )
         self.order_1.master.add(self.master_1)
 
         self.order_2 = Order.objects.create(
+            name='order_2',
             number_employees=2,
             desired_time_end_work='not now',
             status=OrderStatus.OPEN.name,
@@ -150,16 +157,19 @@ class SetupAPITestCase(APITestCase):
             longitude=10,
             latitude=8,
             start_time=timezone.now(),
-            customer=self.user_2
+            customer=self.user_2,
+            price=20,
         )
         self.order_2.master.add(self.master_1)
 
         self.order_3 = Order.objects.create(
+            name='order_3',
             number_employees=2,
             desired_time_end_work='not now',
             status=OrderStatus.CANCELED.name,
             city='Minsk',
             longitude=10,
             latitude=8,
-            start_time=timezone.now()
+            start_time=timezone.now(),
+            price=20,
         )
