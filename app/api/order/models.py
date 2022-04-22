@@ -7,6 +7,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from api.master.models import Master, WorkSphere
+from api.order.models_validators import validate_less_then_forty
 
 
 def get_file_type(file_bytes: bytes) -> str:
@@ -43,29 +44,30 @@ class Order(models.Model):
     Model for table order
     """
 
+    class Meta:
+        verbose_name = 'Order'
+
     work_sphere = models.ForeignKey(to=WorkSphere,
                                     on_delete=models.SET_NULL,
                                     verbose_name='order work sphere',
                                     related_name='order_work_sphere',
-                                    null=True,
-                                    blank=True)
+                                    null=True)
     customer = models.ForeignKey(to=get_user_model(),
                                  on_delete=models.SET_NULL,
                                  related_name='order_customer',
-                                 null=True,
-                                 blank=True)
-    name = models.CharField(max_length=50, verbose_name='Name of order', null=True, blank=True)
-    number_employees = models.IntegerField(verbose_name='number of employees')
-    desired_time_end_work = models.CharField(max_length=10, verbose_name='desired time end of work')
+                                 null=True)
+    name = models.CharField(max_length=50, verbose_name='Order name')
+    number_employees = models.PositiveIntegerField(
+        validators=[validate_less_then_forty],
+        verbose_name='number of employees'
+    )
+    desired_time_end_work = models.CharField(max_length=40, verbose_name='Work duration')
     start_time = models.DateTimeField(verbose_name='work start time')
-    price = models.DecimalField(max_digits=10,
+    price = models.DecimalField(max_digits=8,
                                 decimal_places=2,
-                                verbose_name='Order price',
-                                default=0,
-                                null=True,
-                                blank=True)
-    description = models.TextField(max_length=1024, verbose_name='Description of order', null=True, blank=True)
-    address = models.CharField(max_length=128, verbose_name='Address of the customer', null=True, blank=True)
+                                verbose_name='Order price')
+    description = models.TextField(max_length=255, verbose_name='Description of order', null=True, blank=True)
+    address = models.CharField(max_length=256, verbose_name='Address of the customer', null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=30,
@@ -100,7 +102,7 @@ class OrderFile(models.Model):
     """
 
     class Meta:
-        db_table = 'order_file'
+        verbose_name = 'Order File'
 
     order = models.ForeignKey(to=Order,
                               on_delete=models.CASCADE,
