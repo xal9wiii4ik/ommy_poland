@@ -10,3 +10,4 @@ class UserModelAdmin(admin.ModelAdmin):
     """
 
     list_display = ('pk', 'username', 'email', 'phone_number', 'address', 'is_master')
+    exclude = ['is_superuser', 'is_staff', 'groups', 'user_permissions']
