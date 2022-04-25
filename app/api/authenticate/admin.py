@@ -9,4 +9,4 @@ class ActivateAccountCodesModelAdmin(admin.ModelAdmin):
     Display table ActivateAccountCodes on admin panel
     """
 
-    list_display = ['pk', 'code', 'user']
+    list_display = ['id', 'code', 'user']

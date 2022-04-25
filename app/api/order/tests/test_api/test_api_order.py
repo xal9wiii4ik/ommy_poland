@@ -34,7 +34,7 @@ class OrderModelViewSetTest(SetupAPITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=self.token_1)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(1, len(response.json()['results']))
+        self.assertEqual(2, len(response.json()['results']))
 
     def test_get_list_filter_not_active(self) -> None:
         """
@@ -45,7 +45,7 @@ class OrderModelViewSetTest(SetupAPITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=self.token_1)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(2, len(response.json()['results']))
+        self.assertEqual(1, len(response.json()['results']))
 
     def test_get_retrieve_not_owner(self) -> None:
         """
@@ -137,7 +137,7 @@ class OrderModelViewSetTest(SetupAPITestCase):
         Test case for cancel order
         """
 
-        self.assertEqual('OPEN', self.order_2.status)
+        self.assertEqual('SEARCH_MASTER', self.order_2.status)
         url = reverse('order:order-cancel-order', args=(self.order_2.pk,))
         self.client.credentials(HTTP_AUTHORIZATION=self.token_2)
         response = self.client.patch(url)
@@ -200,4 +200,4 @@ class OrderModelViewSetTest(SetupAPITestCase):
         response = self.client.patch(url)
         self.assertEqual(response.status_code, 200)
         self.order_2.refresh_from_db()
-        self.assertEqual('ACCEPTED', self.order_2.status)
+        self.assertEqual('AWAIT_EXECUTING', self.order_2.status)

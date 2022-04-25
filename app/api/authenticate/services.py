@@ -5,13 +5,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from api.authenticate.models import ActivateAccountCode
 
 
-def activate_account(data: tp.Dict[str, tp.Any]) -> bool:
+def activate_account(data: tp.Dict[str, tp.Any]) -> tp.Union[str, bool]:
     """
     Activate user account
     Args:
         data: dict with data
     Return:
-        True if activate code exist else False
+        username if activate code exist else False
     """
 
     try:
@@ -23,4 +23,4 @@ def activate_account(data: tp.Dict[str, tp.Any]) -> bool:
         user.is_active = True
         user.save()
         activate_code.delete()
-        return True
+        return user.username

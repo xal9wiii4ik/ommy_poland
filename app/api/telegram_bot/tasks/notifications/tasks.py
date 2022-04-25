@@ -29,7 +29,7 @@ def send_notification_with_new_order_to_order_chat(order_pk: int) -> None:
     serializer = GoogleSheetOrderSerializer(order)
     serializer_data = serializer.data
 
-    message = f'New order with pk: {order.pk} has been created\n' \
+    message = f'New order id: {order.pk}\n' \
               f'========Order info========\n' \
               f'Work_sphere: {serializer_data["work_sphere_name"]}\n' \
               f'Order name: {order.name}\n' \
@@ -41,7 +41,7 @@ def send_notification_with_new_order_to_order_chat(order_pk: int) -> None:
               f'Address: {order.address}\n' \
               f'========Customer info========\n' \
               f'Phone number: {order.customer.phone_number}\n' \
-              f'First name: {order.customer.first_name}\n'
+              f'Client name: {order.customer.first_name}\n'
     dp.loop.run_until_complete(dp.bot.send_message(chat_id=settings.ORDER_CHAT_ID, text=message))
 
     send_files_for_notifications(order=order, chat_id=settings.ORDER_CHAT_ID)
