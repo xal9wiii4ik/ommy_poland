@@ -24,6 +24,7 @@ class Master(models.Model):
         related_name='master',
         verbose_name='user'
     )
+    middle_name = models.CharField(max_length=150, verbose_name='middle name')
     longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='longitude in degrees')
     latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='latitude in degrees')
     city = models.CharField(max_length=100, verbose_name='city')
