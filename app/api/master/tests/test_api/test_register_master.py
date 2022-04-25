@@ -14,7 +14,7 @@ class RegisterMasterTest(SetupAPITestCase):
     """
 
     @mock.patch('api.authenticate.tasks.activate_user.tasks.send_phone_activate_message.delay')
-    def test_register_account(self, *args: tp.List[tp.Any]) -> None:
+    def test_register_master(self, *args: tp.List[tp.Any]) -> None:
         account_count = Master.objects.all().count()
 
         url = reverse('master:register')
@@ -28,6 +28,7 @@ class RegisterMasterTest(SetupAPITestCase):
             'work_experience': 2,
             'longitude': 2.5,
             'latitude': 2.6,
+            'middle_name': 'middle',
             'city': 'some city'
         }
         json_data = json.dumps(data)
@@ -51,6 +52,7 @@ class RegisterMasterTest(SetupAPITestCase):
             'work_experience': 2,
             'longitude': 2.5,
             'latitude': 2.6,
+            'middle_name': 'middle',
             'city': 'some city',
             'master_experience': [
                 {

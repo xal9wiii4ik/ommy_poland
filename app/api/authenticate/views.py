@@ -12,7 +12,7 @@ from api.authenticate.serializers import (
     CustomTokenObtainPairSerializer,
     ActivateAccountSerializer,
     CookieTokenRefreshSerializer,
-    CheckActivationCodeSerializer,
+    CheckActivationCodeSerializer, CustomTokenObtainPairActivateSerializer,
 )
 from api.authenticate.services import activate_account
 from api.utils.services import get_serializer_data, set_refresh_to_cookie
@@ -52,10 +52,23 @@ class ActivateAccountApiView(APIView):
         serializer_data = get_serializer_data(data=request.data, serializer=ActivateAccountSerializer)
 
         is_activated = activate_account(data=serializer_data)
+
         if is_activated:
-            return Response(data={'success': 'Account has been activated'}, status=status.HTTP_200_OK)
+            token_serializer = CustomTokenObtainPairActivateSerializer(
+                data={
+                    'username': is_activated,
+                    'password': 'hard',
+                }
+            )
+            token_serializer.is_valid(raise_exception=False)
+            token_serializer_data = token_serializer.validated_data
+            return Response(data=token_serializer_data, status=status.HTTP_200_OK)
         return Response(data={'error': 'Account with this id and code does not exist'},
                         status=status.HTTP_400_BAD_REQUEST)
+
+    def finalize_response(self, request: Request, response: Response, *args, **kwargs):
+        set_refresh_to_cookie(response=response)
+        return super().finalize_response(request, response, *args, **kwargs)
 
 
 class CheckActivationCode(APIView):

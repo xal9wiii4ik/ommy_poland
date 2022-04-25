@@ -31,8 +31,33 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         data = super(CustomTokenObtainPairSerializer, self).validate(attrs)
 
-        user = get_user_model().objects.get(username=attrs['username'])
-        data['fullname'] = f'{user.first_name} {user.last_name}'
+        # user = get_user_model().objects.get(username=attrs['username'])
+        data['fullname'] = f'{self.user.first_name} {self.user.last_name}'
+        return data
+
+
+class CustomTokenObtainPairActivateSerializer(TokenObtainPairSerializer):
+    """ Custom token serializer """
+
+    def validate(self, attrs: tp.Any) -> tp.Any:
+        """ add fields to response data """
+
+        authenticate_kwargs = {
+            self.username_field: attrs[self.username_field],
+            'password': attrs['password'],
+        }
+        try:
+            authenticate_kwargs['request'] = self.context['request']
+        except KeyError:
+            pass
+
+        self.user = get_user_model().objects.get(username=attrs['username'])
+        refresh = self.get_token(self.user)
+        data = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }
+
         return data
 
 
