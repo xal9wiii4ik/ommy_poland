@@ -12,7 +12,7 @@ class User(AbstractUser):
         verbose_name = 'Client'
 
     phone_number = models.CharField(verbose_name='Phone Number', max_length=13, unique=True)
-    address = models.CharField(verbose_name='address',
+    address = models.CharField(verbose_name='Master address',
                                max_length=100,
                                null=True,
                                blank=True)

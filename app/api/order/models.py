@@ -31,12 +31,10 @@ class OrderStatus(Enum):
     Enums with order statuses
     """
 
-    OPEN = 'open'
-    ACCEPTED = 'accepted'
-    IN_PROGRESS = 'in_progress'
-    DONE = 'done'
-    PAID = 'paid'
-    CANCELED = 'canceled'
+    SEARCH_MASTER = 'Поиск мастера'
+    AWAIT_EXECUTING = 'Ожидает выполнения'
+    CANCELED = 'Заявка отменена'
+    PAID = 'Оплачено'
 
 
 class Order(models.Model):
@@ -72,7 +70,7 @@ class Order(models.Model):
     status = models.CharField(
         max_length=30,
         choices=[(order_status.name, order_status.value) for order_status in OrderStatus],
-        default=OrderStatus.OPEN.value
+        default=OrderStatus.SEARCH_MASTER.name
     )
     longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='longitude in degrees')
     latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='latitude in degrees')

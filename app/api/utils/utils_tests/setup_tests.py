@@ -114,7 +114,7 @@ class SetupAPITestCase(APITestCase):
             name='order_1',
             number_employees=1,
             desired_time_end_work='now',
-            status=OrderStatus.OPEN.name,
+            status=OrderStatus.SEARCH_MASTER.name,
             city='Wroclaw',
             longitude=20,
             latitude=13,
@@ -134,11 +134,11 @@ class SetupAPITestCase(APITestCase):
             customer=self.user_1,
             price=20,
         )
-        self.order_1_done = Order.objects.create(
+        self.order_1_search_master = Order.objects.create(
             name='order_1_done',
             number_employees=1,
             desired_time_end_work='now',
-            status=OrderStatus.DONE.name,
+            status=OrderStatus.SEARCH_MASTER.name,
             city='Wroclaw',
             longitude=20,
             latitude=13,
@@ -152,7 +152,7 @@ class SetupAPITestCase(APITestCase):
             name='order_2',
             number_employees=2,
             desired_time_end_work='not now',
-            status=OrderStatus.OPEN.name,
+            status=OrderStatus.SEARCH_MASTER.name,
             city='Minsk',
             longitude=10,
             latitude=8,

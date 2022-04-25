@@ -196,7 +196,7 @@ def add_master_to_order(order: Order, user: get_user_model) -> tp.Tuple[str, int
     if order.number_employees == order.master.all().count():
         send_masters_info_to_customer.delay(order_pk)
 
-    order.status = OrderStatus.ACCEPTED.name
+    order.status = OrderStatus.AWAIT_EXECUTING.name
     order.save()
     return 'Вы приняли заказ, подробности заказа: тут подробности', 200
 
@@ -241,11 +241,9 @@ def filter_order(req: Request, queryset: QuerySet):
     status = req.GET.get('status')
     if status:
         if status == 'active':
-            queryset = queryset.filter(Q(status=OrderStatus.ACCEPTED.name) |
-                                       Q(status=OrderStatus.IN_PROGRESS.name) |
-                                       Q(status=OrderStatus.OPEN.name))
+            queryset = queryset.filter(Q(status=OrderStatus.SEARCH_MASTER.name) |
+                                       Q(status=OrderStatus.AWAIT_EXECUTING.name))
         else:
-            queryset = queryset.filter(Q(status=OrderStatus.DONE.name) |
-                                       Q(status=OrderStatus.CANCELED.name) |
+            queryset = queryset.filter(Q(status=OrderStatus.CANCELED.name) |
                                        Q(status=OrderStatus.PAID.name))
     return queryset
