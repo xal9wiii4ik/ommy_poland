@@ -22,7 +22,6 @@ def create_master_account(
     # create user account
     del data['repeat_password']
     user = get_user_model().objects.create(
-        username=data['username'],
         email=data['email'] if data.get('email') is not None else '',
         phone_number=data['phone_number'],
         first_name=data['first_name'],

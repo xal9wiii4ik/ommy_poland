@@ -23,4 +23,4 @@ def activate_account(data: tp.Dict[str, tp.Any]) -> tp.Union[str, bool]:
         user.is_active = True
         user.save()
         activate_code.delete()
-        return user.username
+        return user.phone_number

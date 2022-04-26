@@ -29,14 +29,13 @@ class SetupAPITestCase(APITestCase):
         self.password = make_password('password')
         url = reverse('authenticate:token')
 
-        self.user_1 = get_user_model().objects.create(username='user_1',
-                                                      is_staff=True,
+        self.user_1 = get_user_model().objects.create(is_staff=True,
                                                       password=self.password,
                                                       is_active=True,
                                                       email='user_1@mail.ru',
                                                       phone_number='+375292125976')
         data = {
-            'username': self.user_1.username,
+            'phone_number': self.user_1.phone_number,
             'password': 'password'
         }
         json_data = json.dumps(data)
@@ -44,13 +43,12 @@ class SetupAPITestCase(APITestCase):
         self.token_1 = f'Token ' \
                        f'{token_data["access"]}'
 
-        self.user_2 = get_user_model().objects.create(username='user_2',
-                                                      password=self.password,
+        self.user_2 = get_user_model().objects.create(password=self.password,
                                                       is_active=True,
                                                       email='user_2@mail.ru',
                                                       phone_number='+375292125979')
         data = {
-            'username': self.user_2.username,
+            'phone_number': self.user_2.phone_number,
             'password': 'password'
         }
         json_data = json.dumps(data)
@@ -58,14 +56,13 @@ class SetupAPITestCase(APITestCase):
         self.token_2 = f'Token ' \
                        f'{token_data["access"]}'
 
-        self.user_master_1 = get_user_model().objects.create(username='user_master_1',
-                                                             password=self.password,
+        self.user_master_1 = get_user_model().objects.create(password=self.password,
                                                              is_active=True,
                                                              email='user_master_1@mail.ru',
                                                              phone_number='+375292125971',
                                                              is_master=True)
         data = {
-            'username': self.user_master_1.username,
+            'phone_number': self.user_master_1.phone_number,
             'password': 'password'
         }
         json_data = json.dumps(data)
@@ -73,14 +70,13 @@ class SetupAPITestCase(APITestCase):
         self.token_master_1 = f'Token ' \
                               f'{token_data["access"]}'
 
-        self.user_master_2 = get_user_model().objects.create(username='user_master_2',
-                                                             password=self.password,
+        self.user_master_2 = get_user_model().objects.create(password=self.password,
                                                              is_active=True,
                                                              email='user_master_2@mail.ru',
                                                              phone_number='+375292125912',
                                                              is_master=True)
         data = {
-            'username': self.user_master_2.username,
+            'phone_number': self.user_master_2.phone_number,
             'password': 'password'
         }
         json_data = json.dumps(data)
@@ -111,10 +107,10 @@ class SetupAPITestCase(APITestCase):
 
         # setup orders
         self.order_1 = Order.objects.create(
-            name='order_1',
             number_employees=1,
             desired_time_end_work='now',
             status=OrderStatus.SEARCH_MASTER.name,
+            types_of_work=['first', 'second'],
             city='Wroclaw',
             longitude=20,
             latitude=13,
@@ -122,11 +118,11 @@ class SetupAPITestCase(APITestCase):
             customer=self.user_1,
             price=20,
         )
-        self.order_1_paid = Order.objects.create(
-            name='order_1_paid',
+        self.order_1_done = Order.objects.create(
             number_employees=1,
             desired_time_end_work='now',
-            status=OrderStatus.PAID.name,
+            status=OrderStatus.DONE.name,
+            types_of_work=['first', 'second'],
             city='Wroclaw',
             longitude=20,
             latitude=13,
@@ -135,9 +131,9 @@ class SetupAPITestCase(APITestCase):
             price=20,
         )
         self.order_1_search_master = Order.objects.create(
-            name='order_1_done',
             number_employees=1,
             desired_time_end_work='now',
+            types_of_work=['first', 'second'],
             status=OrderStatus.SEARCH_MASTER.name,
             city='Wroclaw',
             longitude=20,
@@ -149,7 +145,7 @@ class SetupAPITestCase(APITestCase):
         self.order_1.master.add(self.master_1)
 
         self.order_2 = Order.objects.create(
-            name='order_2',
+            types_of_work=['first', 'second'],
             number_employees=2,
             desired_time_end_work='not now',
             status=OrderStatus.SEARCH_MASTER.name,
@@ -163,8 +159,8 @@ class SetupAPITestCase(APITestCase):
         self.order_2.master.add(self.master_1)
 
         self.order_3 = Order.objects.create(
-            name='order_3',
             number_employees=2,
+            types_of_work=['first', 'second'],
             desired_time_end_work='not now',
             status=OrderStatus.CANCELED.name,
             city='Minsk',

@@ -62,7 +62,7 @@ class UpdatePasswordApiView(APIView):
         token_serializer = CustomTokenObtainPairSerializer(
             data={
                 'password': serializer_data['repeat_password'],
-                'username': user.username
+                'phone_number': user.phone_number
             }
         )
         token_serializer.is_valid(raise_exception=True)

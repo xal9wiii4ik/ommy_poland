@@ -15,7 +15,6 @@ class UserRegisterSerializer(serializers.Serializer):
     Serializer for register new user
     """
 
-    username = serializers.CharField(max_length=50, required=False, read_only=True)
     email = serializers.EmailField(max_length=100, required=False)
     phone_number = serializers.CharField(max_length=13, required=True)
     first_name = serializers.CharField(max_length=100, required=True)
@@ -50,7 +49,6 @@ class UserRegisterSerializer(serializers.Serializer):
             password=attrs['password'],
             repeat_password=attrs['repeat_password']
         )
-        attrs['username'] = attrs['phone_number']
         return attrs
 
 

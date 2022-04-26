@@ -245,5 +245,5 @@ def filter_order(req: Request, queryset: QuerySet):
                                        Q(status=OrderStatus.AWAIT_EXECUTING.name))
         else:
             queryset = queryset.filter(Q(status=OrderStatus.CANCELED.name) |
-                                       Q(status=OrderStatus.PAID.name))
+                                       Q(status=OrderStatus.DONE.name))
     return queryset
