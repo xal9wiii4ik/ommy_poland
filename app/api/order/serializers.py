@@ -42,6 +42,10 @@ class OrderModelSerializer(serializers.ModelSerializer):
         model = Order
         fields = '__all__'
         read_only_fields = ['customer', 'date_created', 'master']
+        extra_kwargs = {
+            'work_sphere': {'required': True},
+            'types_of_work': {'required': True}
+        }
 
 
 class GoogleSheetOrderSerializer(serializers.ModelSerializer):

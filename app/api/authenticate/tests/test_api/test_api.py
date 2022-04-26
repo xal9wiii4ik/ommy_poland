@@ -16,7 +16,6 @@ class TokensAPITestCase(APITestCase):
         self.password = 'password'
 
         self.user_1 = get_user_model().objects.create(
-            username='user_1',
             password=make_password(self.password),
             phone_number='+375292125976'
         )
@@ -26,7 +25,7 @@ class TokensAPITestCase(APITestCase):
         url_1 = reverse('authenticate:token_refresh')
 
         data = {
-            'username': self.user_1.username,
+            'phone_number': self.user_1.phone_number,
             'password': self.password
         }
         json_data = json.dumps(data)
@@ -53,7 +52,6 @@ class ActivateAccountAPITestCase(APITestCase):
         self.password = 'password'
 
         self.user_1 = get_user_model().objects.create(
-            username='user_1',
             password=make_password(self.password),
             phone_number='+375292125976',
             is_active=False

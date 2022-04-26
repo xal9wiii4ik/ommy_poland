@@ -99,10 +99,12 @@ class OrderModelViewSetTest(SetupAPITestCase):
             'desired_time_end_work': 'now',
             'latitude': 20,
             'longitude': 12,
+            'address': 'some_address',
             'number_employees': 2,
             'start_time': '2022-04-03T00:00:00+01:00',
-            'name': 'some name',
-            'price': 20
+            'types_of_work': ['some type_1', 'second'],
+            'price': 20,
+            'work_sphere': self.work_sphere_1.pk
         }
         json_data = json.dumps(data)
         response = self.client.post(url, data=json_data, content_type='application/json')

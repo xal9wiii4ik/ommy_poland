@@ -43,7 +43,8 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
     permission_classes = (IsCustomerPermission,)
 
     def get_queryset(self):
-        return self.queryset.filter(customer=self.request.user)
+        user = self.request.user
+        return self.queryset.filter(customer=user) if user.is_authenticated else self.queryset.none()
 
     def list(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
         queryset = filter_order(req=request, queryset=self.get_queryset())

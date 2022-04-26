@@ -31,7 +31,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         data = super(CustomTokenObtainPairSerializer, self).validate(attrs)
 
-        # user = get_user_model().objects.get(username=attrs['username'])
         data['fullname'] = f'{self.user.first_name} {self.user.last_name}'
         return data
 
@@ -51,7 +50,7 @@ class CustomTokenObtainPairActivateSerializer(TokenObtainPairSerializer):
         except KeyError:
             pass
 
-        self.user = get_user_model().objects.get(username=attrs['username'])
+        self.user = get_user_model().objects.get(phone_number=attrs['phone_number'])
         refresh = self.get_token(self.user)
         data = {
             'refresh': str(refresh),

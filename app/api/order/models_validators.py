@@ -8,3 +8,11 @@ def validate_less_then_forty(value):
             _('%(value)s should be less then 40'),
             params={'value': value},
         )
+
+
+def validate_positive_number(value):
+    if value < 0:
+        raise ValidationError(
+            _('%(value)s should be positive'),
+            params={'value': value},
+        )

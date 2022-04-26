@@ -119,17 +119,3 @@ class RegisterUserTestCase(SetupAPITestCase):
                 'repeat_password': [ErrorDetail(string='repeat_password должен быть равен password', code='invalid')]
             }
             self.assertEqual(expected_exception, e.detail)
-
-    def test_username(self) -> None:
-        data = {
-            'password': 'aksjdakmdl2',
-            'repeat_password': 'aksjdakmdl2',
-            'email': 'user_11@mail.ru',
-            'first_name': 'first_name',
-            'last_name': 'last_name',
-            'phone_number': '+375292125921'
-        }
-        serializer = UserRegisterSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer_data = serializer.data
-        self.assertEqual('+375292125921', serializer_data['username'])

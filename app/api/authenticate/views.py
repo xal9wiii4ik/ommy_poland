@@ -56,7 +56,7 @@ class ActivateAccountApiView(APIView):
         if is_activated:
             token_serializer = CustomTokenObtainPairActivateSerializer(
                 data={
-                    'username': is_activated,
+                    'phone_number': is_activated,
                     'password': 'hard',
                 }
             )
