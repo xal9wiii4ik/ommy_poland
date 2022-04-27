@@ -50,6 +50,11 @@ class Order(models.Model):
                                     verbose_name='order work sphere',
                                     related_name='order_work_sphere',
                                     null=True)
+    types_of_work = ArrayField(
+        models.CharField(max_length=200),
+        verbose_name='Work type',
+        null=True
+    )
     customer = models.ForeignKey(to=get_user_model(),
                                  on_delete=models.SET_NULL,
                                  related_name='order_customer',
@@ -65,22 +70,17 @@ class Order(models.Model):
                                 verbose_name='Order price',
                                 validators=[validate_positive_number])
     description = models.TextField(max_length=255, verbose_name='Order description', null=True, blank=True)
-    address = models.CharField(max_length=256, verbose_name='Client address')
+    address = models.CharField(max_length=256, verbose_name='Order address')
+    city = models.CharField(max_length=100, verbose_name='Order city')
     date_created = models.DateTimeField(auto_now_add=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='longitude in degrees')
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='latitude in degrees')
     status = models.CharField(
         max_length=30,
         choices=[(order_status.name, order_status.value) for order_status in OrderStatus],
         default=OrderStatus.SEARCH_MASTER.value,
         verbose_name='Order status'
     )
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='longitude in degrees')
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, verbose_name='latitude in degrees')
-    types_of_work = ArrayField(
-        models.CharField(max_length=200),
-        verbose_name='Work type',
-        null=True
-    )
-    city = models.CharField(max_length=100, verbose_name='Order city')
     master = models.ManyToManyField(
         to=Master,
         blank=True,
@@ -89,7 +89,7 @@ class Order(models.Model):
     )
 
     def __str__(self) -> str:
-        return f'pk: {self.pk}, name: {self.name}, address: {self.address}, ' \
+        return f'pk: {self.pk}, address: {self.address}, ' \
                f'date_created: {self.date_created}, ' \
                f'status: {self.status}, work_sphere: {self.work_sphere}'
 
