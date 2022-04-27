@@ -22,5 +22,4 @@ class User(AbstractUser):
     is_master = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return f'id: {self.pk}, email: {self.email}, ' \
-               f'phone_number: {self.phone_number}'
+        return f'id: {self.pk} phone_number: {self.phone_number}'

@@ -13,7 +13,7 @@ class OrderModelAdmin(admin.ModelAdmin):
     """ Display model Order in admin panel """
 
     @staticmethod
-    def display_work_sphere_name(obj: Order) -> str:
+    def work_sphere_name(obj: Order) -> str:
         if obj.work_sphere is not None:
             return obj.work_sphere.name
         return 'Work sphere was remove'
@@ -21,7 +21,7 @@ class OrderModelAdmin(admin.ModelAdmin):
     # TODO add masters to list display
     list_display = ('id', 'types_of_work', 'customer',
                     'start_time', 'price', 'status',
-                    'display_work_sphere_name', 'city')
+                    'work_sphere_name', 'city')
 
 
 @admin.register(OrderFile)
