@@ -26,7 +26,6 @@ class MasterRegisterSerializer(UserRegisterSerializer):
     city = serializers.CharField(max_length=100, required=True)
     first_name = serializers.CharField(max_length=100, required=True)
     last_name = serializers.CharField(max_length=100, required=True)
-    middle_name = serializers.CharField(max_length=100, required=True)
 
 
 class MasterModelSerializer(serializers.ModelSerializer):

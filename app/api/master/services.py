@@ -28,7 +28,8 @@ def create_master_account(
         last_name=data['last_name'],
         password=data['password'],
         is_active=False,
-        is_master=True
+        is_master=True,
+        middle_name=data['middle_name'],
     )
     del data['password']
 
@@ -38,7 +39,6 @@ def create_master_account(
         longitude=data['longitude'],
         latitude=data['latitude'],
         city=data['city'].lower(),
-        middle_name=data['middle_name'],
     )
     send_phone_activate_message.delay(user.id)
     if master_experiences is not None:

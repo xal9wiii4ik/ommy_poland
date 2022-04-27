@@ -25,7 +25,8 @@ class RegisterAccountTest(SetupAPITestCase):
             'email': 'some@email.ru',
             'first_name': 'first_name',
             'last_name': 'last_name',
-            'phone_number': '+375292125918'
+            'phone_number': '+375292125918',
+            'middle_name': 'middle'
         }
         json_data = json.dumps(data)
         response = self.client.post(path=url, data=json_data, content_type='application/json')

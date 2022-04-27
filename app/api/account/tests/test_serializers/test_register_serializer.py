@@ -17,7 +17,8 @@ class RegisterUserTestCase(SetupAPITestCase):
                 'email': 'some@email.ru',
                 'first_name': 'first_name',
                 'last_name': 'last_name',
-                'phone_number': '+375292125978'
+                'phone_number': '+375292125978',
+                'middle_name': 'middle'
             }
             serializer = UserRegisterSerializer(data=data)
             serializer.is_valid(raise_exception=True)
@@ -38,7 +39,8 @@ class RegisterUserTestCase(SetupAPITestCase):
                 'email': 'some@email.ru',
                 'first_name': 'first_name',
                 'last_name': 'last_name',
-                'phone_number': '+375292105978'
+                'phone_number': '+375292105978',
+                'middle_name': 'middle'
             }
             serializer = UserRegisterSerializer(data=data)
             serializer.is_valid(raise_exception=True)
@@ -56,7 +58,8 @@ class RegisterUserTestCase(SetupAPITestCase):
                 'email': 'some@email.ru',
                 'first_name': 'first_name',
                 'last_name': 'last_name',
-                'phone_number': '375292125978'
+                'phone_number': '375292125978',
+                'middle_name': 'middle'
             }
             serializer = UserRegisterSerializer(data=data)
             serializer.is_valid(raise_exception=True)
@@ -74,7 +77,8 @@ class RegisterUserTestCase(SetupAPITestCase):
                 'email': 'user_1@mail.ru',
                 'first_name': 'first_name',
                 'last_name': 'last_name',
-                'phone_number': '+375292125921'
+                'phone_number': '+375292125921',
+                'middle_name': 'middle'
             }
             serializer = UserRegisterSerializer(data=data)
             serializer.is_valid(raise_exception=True)
@@ -92,7 +96,8 @@ class RegisterUserTestCase(SetupAPITestCase):
                 'email': 'someemail.ru',
                 'first_name': 'first_name',
                 'last_name': 'last_name',
-                'phone_number': '+375292125921'
+                'phone_number': '+375292125921',
+                'middle_name': 'middle'
             }
             serializer = UserRegisterSerializer(data=data)
             serializer.is_valid(raise_exception=True)
@@ -110,7 +115,8 @@ class RegisterUserTestCase(SetupAPITestCase):
                 'email': 'user_11@mail.ru',
                 'first_name': 'first_name',
                 'last_name': 'last_name',
-                'phone_number': '+375292125921'
+                'phone_number': '+375292125921',
+                'middle_name': 'middle'
             }
             serializer = UserRegisterSerializer(data=data)
             serializer.is_valid(raise_exception=True)
