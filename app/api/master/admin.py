@@ -23,7 +23,7 @@ class MasterModelAdmin(admin.ModelAdmin):
         link = reverse('admin:account_user_change', args=[obj.user.pk])
         return mark_safe(f'<a href="{link}">User</a>')
 
-    list_display = ('id', 'middle_name', 'city', 'work_experiences', 'move_to_user')
+    list_display = ('id', 'city', 'work_experiences', 'move_to_user')
     readonly_fields = ('longitude', 'latitude',)
 
 
