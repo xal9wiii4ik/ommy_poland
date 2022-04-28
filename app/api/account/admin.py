@@ -11,7 +11,7 @@ class UserModelAdmin(admin.ModelAdmin):
 
     @staticmethod
     def name(user: User):
-        return f'{user.first_name} {user.last_name}'
+        return f'{user.first_name} {user.middle_name}'
 
     list_display = ('id', 'name', 'phone_number', 'is_master')
     exclude = ['is_superuser', 'is_staff', 'groups', 'user_permissions', 'password']
