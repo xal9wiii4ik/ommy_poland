@@ -1,10 +1,9 @@
 import random
 
-from twilio.rest import Client
 
 from celery import shared_task
 
-from ommy_polland import settings
+from api.utils.tasks_utils import send_phone_message
 
 
 # TODO add beat task for removing codes(mb if more than 1 day)
@@ -23,10 +22,16 @@ def send_phone_activate_message(user_pk: int) -> None:
     user = get_user_model().objects.get(pk=user_pk)
     activate_code = ActivateAccountCode.objects.create(user=user, code=random.randint(1000, 9999))
 
-    # send message to user
-    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-    _ = client.messages.create(
-        to=user.phone_number,
-        from_=settings.TWILIO_PHONE_NUMBER,
-        body=f'Ваш код подтверждения: {activate_code.code}'
-    )
+    send_phone_message(message=f'Ваш код подтверждения: {activate_code.code}', recipients_number=user.phone_number)
+
+
+@shared_task
+def resend_code(phone_number: str, code: int) -> None:
+    """
+    Resend activating code
+    Args:
+        phone_number: phone_number
+        code: code
+    """
+
+    send_phone_message(message=f'Ваш код подтверждения: {code}', recipients_number=phone_number)
