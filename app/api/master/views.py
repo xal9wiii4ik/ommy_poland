@@ -67,7 +67,6 @@ class MasterExperienceModelViewSet(mixins.ListModelMixin,
 
 class MasterModelViewSet(mixins.RetrieveModelMixin,
                          mixins.UpdateModelMixin,
-                         mixins.DestroyModelMixin,
                          mixins.ListModelMixin,
                          GenericViewSet):
     """

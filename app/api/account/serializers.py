@@ -66,7 +66,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
         if phone_number.find('+') == 0 and phone_number.replace('+', '').isdigit() and len(phone_number) == 13:
             if get_user_model().objects.filter(phone_number=phone_number):
                 return phone_number
-            raise serializers.ValidationError('Пользователь с таким номером телефоне не найден в нашей базе')
+            raise serializers.ValidationError('Пользователь с таким номером телефона не найден в нашей базе')
         else:
             raise serializers.ValidationError('Неверный номер телефона, прмиер: +375*********')
 

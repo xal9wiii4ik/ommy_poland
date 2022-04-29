@@ -1,6 +1,7 @@
 import typing as tp
 
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -8,6 +9,7 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 
 from api.authenticate.models import ActivateAccountCode
+from api.authenticate.validations import access_to_resend_code
 
 
 class CookieTokenRefreshSerializer(TokenRefreshSerializer):
@@ -77,3 +79,31 @@ class ActivateAccountSerializer(CheckActivationCodeSerializer):
     """ Serializer for activate account """
 
     user_pk = serializers.IntegerField(required=True)
+
+
+class ResendingActivatingCodeSerializer(serializers.Serializer):
+    """ Serializer for resending activating message code """
+
+    user_pk = serializers.IntegerField(required=True)
+    code = serializers.IntegerField(min_value=1000, max_value=9999, read_only=True)
+    phone_number = serializers.CharField(max_length=13, read_only=True)
+
+    def validate(self, attrs: tp.Any) -> tp.Any:
+        activate_code = ActivateAccountCode.objects.filter(user__pk=attrs['user_pk'])
+        if not activate_code:
+            raise ValidationError('У вас нету активных кодов активации')
+        activate_code = activate_code[0]
+
+        # check if user has access to resend activation code and update number of resending
+        last_resend_datetime = activate_code.last_resend_datetime
+        access_to_resend_code(
+            last_resend_datetime=last_resend_datetime,
+            number_resending=activate_code.number_resending
+        )
+        activate_code.number_resending += 1
+        activate_code.last_resend_datetime = timezone.now()
+        activate_code.save()
+
+        attrs['code'] = activate_code.code
+        attrs['phone_number'] = activate_code.user.phone_number
+        return attrs
