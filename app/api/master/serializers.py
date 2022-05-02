@@ -37,6 +37,7 @@ class MasterModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Master
         fields = '__all__'
+        read_only_fields = ['user']
 
 
 class WorkSphereModelSerializer(serializers.ModelSerializer):

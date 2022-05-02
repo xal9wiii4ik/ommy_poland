@@ -75,10 +75,17 @@ class CheckActivationCodeSerializer(serializers.Serializer):
         return code
 
 
-class ActivateAccountSerializer(CheckActivationCodeSerializer):
+class ActivateAccountSerializer(serializers.Serializer):
     """ Serializer for activate account """
 
+    code = serializers.IntegerField(min_value=1000, max_value=9999)
     user_pk = serializers.IntegerField(required=True)
+
+    def validate(self, attrs: tp.Dict[str, tp.Any]) -> tp.Dict[str, tp.Any]:
+        is_exist = ActivateAccountCode.objects.filter(code=attrs['code'], user__pk=attrs['user_pk']).exists()
+        if not is_exist:
+            raise ValidationError({'code': 'code with this user does not exist'})
+        return attrs
 
 
 class ResendingActivatingCodeSerializer(serializers.Serializer):
@@ -91,7 +98,7 @@ class ResendingActivatingCodeSerializer(serializers.Serializer):
     def validate(self, attrs: tp.Any) -> tp.Any:
         activate_code = ActivateAccountCode.objects.filter(user__pk=attrs['user_pk'])
         if not activate_code:
-            raise ValidationError('У вас нету активных кодов активации')
+            raise ValidationError({'code': 'У вас нету активных кодов активации'})
         activate_code = activate_code[0]
 
         # check if user has access to resend activation code and update number of resending

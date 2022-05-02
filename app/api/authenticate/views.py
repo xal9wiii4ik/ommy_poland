@@ -77,7 +77,7 @@ class ActivateAccountApiView(APIView):
         return super().finalize_response(request, response, *args, **kwargs)
 
 
-class CheckActivationCode(APIView):
+class CheckActivationCodeApiView(APIView):
     """ Check activation code(if he exist in db) """
 
     permission_classes = (AllowAny,)
@@ -88,7 +88,7 @@ class CheckActivationCode(APIView):
         return Response(data=serializer_data, status=status.HTTP_200_OK)
 
 
-class ResendingActivatingCode(APIView):
+class ResendingActivatingCodeApiView(APIView):
     """ Resending activating code to user """
 
     permission_classes = (AllowAny,)
