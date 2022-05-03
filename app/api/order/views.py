@@ -104,6 +104,7 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
         #     notification_with_coming_order.apply_async(eta=start_time, args=(response.data['id'],))
         return response
 
+    # TODO not working now, add tests letter
     @action(detail=True,
             methods=['PATCH'],
             permission_classes=[IsMasterPermission],

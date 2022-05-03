@@ -4,8 +4,6 @@ from django.utils import timezone
 
 from rest_framework.serializers import ValidationError
 
-wait_minutes = {0: 0, 1: 0.5, 2: 1, 3: 5, 4: 10, 5: 15, 6: 30, 7: 60}
-
 
 def access_to_resend_code(last_resend_datetime: datetime, number_resending: int) -> None:
     """
@@ -15,6 +13,7 @@ def access_to_resend_code(last_resend_datetime: datetime, number_resending: int)
         number_resending: number of resending
     """
 
+    wait_minutes = {0: 0, 1: 0.5, 2: 1, 3: 5, 4: 10, 5: 15, 6: 30, 7: 60}
     if number_resending > 7:
         raise ValidationError(
             {'code': 'Вы израсходовали 7 попыток повторного отправки кода, обратитесь к администратору'}

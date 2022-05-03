@@ -7,6 +7,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from api.authenticate.models import ActivateAccountCode
+from api.authenticate.tests.test_serializers.test_resend_code import ResendCodeSetUp
 
 
 class TokensAPITestCase(APITestCase):
@@ -76,29 +77,53 @@ class ActivateAccountAPITestCase(APITestCase):
         self.assertEqual(ActivateAccountCode.objects.all().count(), 0)
         self.user_1.refresh_from_db()
         self.assertTrue(self.user_1.is_active)
+        self.assertIsNotNone(self.client.cookies.get('refresh'))
+        self.assertIsNone(response.json().get('refresh'))
 
-    def test_check_activation_code_does_not_exist(self) -> None:
+    def test_activate_account_not_valid(self) -> None:
         """
-        Test Check activation code does not exist
+        Test Activate account not valid code
         """
 
-        url = reverse('authenticate:check_activation_code')
+        url = reverse('authenticate:activate')
         data = {
-            'code': 1239
+            'user_pk': self.user_1.pk,
+            'code': 1982
         }
         json_data = json.dumps(data)
         response = self.client.post(url, data=json_data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {'code': ['code with this user does not exist']})
+        self.assertIsNone(self.client.cookies.get('refresh'))
+        self.assertIsNone(response.json().get('refresh'))
 
-    def test_check_activation_code(self) -> None:
-        """
-        Test Check activation code
-        """
 
-        url = reverse('authenticate:check_activation_code')
-        data = {
-            'code': self.code.code
-        }
+class ResendingActivatingCodeApiViewTestCase(ResendCodeSetUp):
+    """ Test case for ResendingActivatingCodeApiView """
+
+    def test_valid(self) -> None:
+        url = reverse('authenticate:resend_code')
+        data = {'user_pk': self.user.pk}
         json_data = json.dumps(data)
-        response = self.client.post(url, data=json_data, content_type='application/json')
+        response = self.client.post(path=url, data=json_data, content_type='application/json')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {'code': 'Код был отправлен'})
+
+
+class CheckActivationCodeApiViewTestCase(ResendCodeSetUp):
+    """ Test Case for CheckActivationCodeApiView """
+
+    def test_valid(self) -> None:
+        url = reverse('authenticate:check_activation_code')
+        data = {'code': self.code.code}
+        json_data = json.dumps(data)
+        response = self.client.post(path=url, data=json_data, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+    def test_not_valid(self) -> None:
+        url = reverse('authenticate:check_activation_code')
+        data = {'code': 9876}
+        json_data = json.dumps(data)
+        response = self.client.post(path=url, data=json_data, content_type='application/json')
+        self.assertEqual(response.json(), {'code': ['Не верный код активации']})
+        self.assertEqual(response.status_code, 400)
