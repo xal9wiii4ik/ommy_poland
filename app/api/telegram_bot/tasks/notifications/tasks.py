@@ -33,8 +33,8 @@ def send_notification_with_new_order_to_order_chat(order_pk: int) -> None:
               f'========Order info========\n' \
               f'Work_sphere: {serializer_data["work_sphere_name"]}\n' \
               f'Order work type: {order.types_of_work}\n' \
-              f'Work duration: {order.number_employees}\n' \
-              f'Desired time end work: {order.desired_time_end_work}\n' \
+              f'Number Employees: {order.number_employees}\n' \
+              f'Work duration: {order.desired_time_end_work}\n' \
               f'Start work time: {serializer_data["start_time"]}\n' \
               f'Price: {order.price} BYN\n' \
               f'Description: {order.description}\n' \
