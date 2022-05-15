@@ -157,7 +157,7 @@ def update_order_google_sheet(order_pk: int):
     service_account = gspread.service_account()
     sheet = service_account.open(settings.SHEET)
 
-    work_sheet = sheet.worksheet(settings.WORK_SHEET)
+    work_sheet = sheet.worksheet(settings.ORDER_WORK_SHEET)
 
     # TODO update commission
     order = Order.objects.select_related('customer').select_related('work_sphere').annotate(
@@ -172,15 +172,7 @@ def update_order_google_sheet(order_pk: int):
     count_columns = len(work_sheet.get_all_values())
     current_column = count_columns + 1
 
-    columns_name = 'BCDEFGHIJKLM'
-
-    order_number = None
-    for value in reversed(work_sheet.col_values(1)):
-        if value.isnumeric():
-            order_number = int(value) + 1
-            break
-
-    work_sheet.update(f'A{current_column}', order_number if order_number is not None else 1)
+    columns_name = 'ABCDEFGHIJKLM'
 
     for index, key in enumerate(serializer_data.keys()):
         if key == 'order_files':
@@ -189,6 +181,8 @@ def update_order_google_sheet(order_pk: int):
                 work_sheet.update(f'{columns_name[index]}{current_column + additional_columns}', file['bucket_path'])
                 additional_columns += 1
         else:
-            work_sheet.update(f'{columns_name[index]}{current_column}', serializer_data[key])
+            work_sheet.update(f'{columns_name[index]}{current_column}',
+                              serializer_data[key] if key != 'price' else float(serializer_data[key]),
+                              value_input_option="USER_ENTERED")
 
     work_sheet.columns_auto_resize(0, 14)

@@ -60,7 +60,7 @@ class GoogleSheetOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['date_created', 'phone_number', 'first_name', 'work_sphere_name',
+        fields = ['id', 'date_created', 'phone_number', 'first_name', 'work_sphere_name',
                   'number_employees', 'desired_time_end_work', 'start_time',
                   'address', 'description', 'order_files',
                   'price', 'status']
