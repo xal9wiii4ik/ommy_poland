@@ -39,3 +39,15 @@ class MasterExperienceModelAdmin(admin.ModelAdmin):
     """
     Display table MasterExperience on admin panel
     """
+
+    @staticmethod
+    def master_work_sphere(obj: MasterExperience) -> str:
+        if obj.work_sphere is not None:
+            return obj.work_sphere.name
+        return 'Work sphere was remove'
+
+    @staticmethod
+    def master_id(obj: MasterExperience) -> str:
+        return obj.master.id
+
+    list_display = ('id', 'master_work_sphere', 'experience', 'master_id')
