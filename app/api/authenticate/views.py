@@ -13,7 +13,9 @@ from api.authenticate.serializers import (
     CustomTokenObtainPairSerializer,
     ActivateAccountSerializer,
     CookieTokenRefreshSerializer,
-    CheckActivationCodeSerializer, CustomTokenObtainPairActivateSerializer, ResendingActivatingCodeSerializer,
+    CheckActivationCodeSerializer,
+    CustomTokenObtainPairActivateSerializer,
+    ResendingActivatingCodeSerializer,
 )
 from api.authenticate.services import activate_account
 from api.authenticate.tasks.activate_user.tasks import resend_code
