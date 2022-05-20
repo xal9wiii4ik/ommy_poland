@@ -3,7 +3,7 @@ import typing as tp
 from drf_yasg.utils import swagger_auto_schema
 
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,7 +13,9 @@ from api.authenticate.serializers import (
     CustomTokenObtainPairSerializer,
     ActivateAccountSerializer,
     CookieTokenRefreshSerializer,
-    CheckActivationCodeSerializer, CustomTokenObtainPairActivateSerializer, ResendingActivatingCodeSerializer,
+    CheckActivationCodeSerializer,
+    CustomTokenObtainPairActivateSerializer,
+    ResendingActivatingCodeSerializer,
 )
 from api.authenticate.services import activate_account
 from api.authenticate.tasks.activate_user.tasks import resend_code
@@ -98,3 +100,12 @@ class ResendingActivatingCodeApiView(APIView):
         serializer_data = get_serializer_data(data=request.data, serializer=ResendingActivatingCodeSerializer)
         resend_code.delay(serializer_data['phone_number'], serializer_data['code'])
         return Response(data={'code': 'Код был отправлен'}, status=status.HTTP_200_OK)
+
+
+class ValidateAccessTokenApiView(APIView):
+    """ Checking if access token is valid """
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
+        return Response(data={}, status=status.HTTP_200_OK)
