@@ -1,8 +1,16 @@
+import typing as tp
+
 from django.contrib import admin
+from django.core.handlers.wsgi import WSGIRequest
+from django.db.models import QuerySet
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+from api.master.forms import DateRangeForm
 from api.master.models import Master, MasterExperience, WorkSphere
+from api.master.tasks.reports.tasks import update_master_info_google_sheet
 
 
 @admin.register(Master)
@@ -25,6 +33,30 @@ class MasterModelAdmin(admin.ModelAdmin):
 
     list_display = ('id', 'city', 'work_experiences', 'move_to_user')
     readonly_fields = ('longitude', 'latitude',)
+
+    actions = ['report_commission_amount']
+
+    def report_commission_amount(
+            self, request: WSGIRequest,
+            queryset: QuerySet) -> tp.Union[render, HttpResponseRedirect]:
+        if 'apply' in request.POST:
+            form = DateRangeForm(request.POST)
+
+            if form.is_valid():
+                update_master_info_google_sheet.delay(
+                    [master.pk for master in queryset],
+                    form.cleaned_data['start'],
+                    form.cleaned_data['end']
+                )
+            self.message_user(request, 'Google sheet will be updated')
+            return HttpResponseRedirect(request.get_full_path())
+        return render(
+            request=request,
+            template_name='admin/commission/commission_amount.html',
+            context={'orders': queryset, 'form': DateRangeForm()}
+        )
+
+    report_commission_amount.short_description = 'Report commission amount'  # type: ignore
 
 
 @admin.register(WorkSphere)

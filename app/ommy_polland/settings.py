@@ -62,7 +62,7 @@ ROOT_URLCONF = 'ommy_polland.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -214,6 +214,7 @@ TWILIO_PHONE_NUMBER = os.environ.get('TWILIO_PHONE_NUMBER')  # type: ignore
 # GOOGLE SHEETS
 SHEET = os.environ.get('SHEET')
 ORDER_WORK_SHEET = os.environ.get('ORDER_WORK_SHEET')
+MASTER_WORK_SHEET = os.environ.get('MASTER_WORK_SHEET')
 
 # STATIC FILES
 STATIC_URL = "/staticfiles/"

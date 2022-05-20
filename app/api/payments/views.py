@@ -24,3 +24,12 @@ class CommissionApiView(APIView):
             data={'commission': f'Has been created, {serializer_data["missing_pks"]} skipped'},
             status=status.HTTP_200_OK
         )
+
+
+class ReportCommissionApiView(APIView):
+    """ Creating report for commission """
+
+    permission_classes = (IsStaffPermission,)
+
+    def post(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
+        return Response(data={}, status=status.HTTP_200_OK)
