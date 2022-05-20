@@ -21,7 +21,6 @@ class CommissionSerializer(serializers.Serializer):
             raise ValidationError('order with given pk does not exist')
         return order_pk
 
-    # TODO test O time
     def validate(self, attrs: tp.Dict[str, tp.Any]):
         pks = [master.pk for master in Master.objects.filter(pk__in=attrs['masters_pks'])]
         attrs['missing_pks'] = set(attrs['masters_pks']).difference(pks)
