@@ -42,14 +42,6 @@ class WorkSphereModelSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class WorkSphereGoogleSheetModelSerializer(serializers.ModelSerializer):
-    """ Serializer for work sphere which using in master work sheet """
-
-    class Meta:
-        model = WorkSphere
-        fields = ('name',)
-
-
 class MasterWorkSheetSerializer(serializers.Serializer):
     """ Serializer for master work sheet """
 
