@@ -20,7 +20,7 @@ class ApiViewTest(SetupAPITestCase):
         json_data = json.dumps(data)
         self.client.credentials(HTTP_AUTHORIZATION=self.token_1)
         response = self.client.post(path=url, data=json_data, content_type='application/json')
-        self.assertEqual(response.data, {'commission': 'Has been created, [101] skipped'})
+        self.assertEqual(response.data, {'commission': f'Has been created, [{self.master_1.pk + 100}] skipped'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(float(Commission.objects.first().amount), 2.0)
         self.assertEqual(Commission.objects.all().count(), count_commissions + 1)
