@@ -1,5 +1,6 @@
 import json
 import mock
+import typing as tp
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
@@ -103,7 +104,7 @@ class ResendingActivatingCodeApiViewTestCase(ResendCodeSetUp):
     """ Test case for ResendingActivatingCodeApiView """
 
     @mock.patch('api.authenticate.tasks.activate_user.tasks.resend_code.delay')
-    def test_valid(self) -> None:
+    def test_valid(self, *args: tp.Any) -> None:
         url = reverse('authenticate:resend_code')
         data = {'user_pk': self.user.pk}
         json_data = json.dumps(data)

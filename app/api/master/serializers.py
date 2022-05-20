@@ -5,9 +5,7 @@ from api.master.models import Master, MasterExperience, WorkSphere
 
 
 class MasterExperienceModelSerializer(serializers.ModelSerializer):
-    """
-    Model Serializer for model MasterExperience
-    """
+    """ Model Serializer for model MasterExperience """
 
     class Meta:
         model = MasterExperience
@@ -16,9 +14,7 @@ class MasterExperienceModelSerializer(serializers.ModelSerializer):
 
 
 class MasterRegisterSerializer(UserRegisterSerializer):
-    """
-    Serializer for register master
-    """
+    """ Serializer for register master """
 
     master_experience = MasterExperienceModelSerializer(many=True, required=False)
     longitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=True)
@@ -30,9 +26,7 @@ class MasterRegisterSerializer(UserRegisterSerializer):
 
 
 class MasterModelSerializer(serializers.ModelSerializer):
-    """
-    Model Serializer for model master
-    """
+    """ Model Serializer for model master """
 
     class Meta:
         model = Master
@@ -41,10 +35,20 @@ class MasterModelSerializer(serializers.ModelSerializer):
 
 
 class WorkSphereModelSerializer(serializers.ModelSerializer):
-    """
-    Model Serializer for model work sphere
-    """
+    """ Model Serializer for model work sphere """
 
     class Meta:
         model = WorkSphere
         fields = '__all__'
+
+
+class MasterWorkSheetSerializer(serializers.Serializer):
+    """ Serializer for master work sheet """
+
+    id = serializers.IntegerField()
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    middle_name = serializers.CharField(source='user.middle_name')
+    phone_number = serializers.CharField(source='user.phone_number')
+    email = serializers.CharField(source='user.email')
+    amount = serializers.FloatField()
