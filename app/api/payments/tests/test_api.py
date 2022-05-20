@@ -48,3 +48,14 @@ class ApiViewTest(SetupAPITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=self.token_1)
         response = self.client.post(path=url, data=json_data, content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_commission_bad_master_pk(self) -> None:
+        url = reverse('payments:create_commission')
+        data = {
+            'masters_pks': [0, 0, self.master_1.pk + 100],
+            'order_pk': 0
+        }
+        json_data = json.dumps(data)
+        self.client.credentials(HTTP_AUTHORIZATION=self.token_1)
+        response = self.client.post(path=url, data=json_data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

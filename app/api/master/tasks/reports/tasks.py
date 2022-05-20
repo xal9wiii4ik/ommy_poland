@@ -38,7 +38,6 @@ def update_master_info_google_sheet(masters_ids: tp.List[int], start_date: str, 
     serializer_data = serializer.data
 
     current_column = 2
-
     columns_name = 'ABCDEFGHIJ'
 
     for data in serializer_data:
