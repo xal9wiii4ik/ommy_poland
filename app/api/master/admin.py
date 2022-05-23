@@ -65,6 +65,8 @@ class WorkSphereModelAdmin(admin.ModelAdmin):
     Display table WorkSphere on admin panel
     """
 
+    list_display = ('id', 'name',)
+
 
 @admin.register(MasterExperience)
 class MasterExperienceModelAdmin(admin.ModelAdmin):
