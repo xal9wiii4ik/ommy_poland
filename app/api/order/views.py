@@ -23,6 +23,7 @@ from api.order.services import (
 from api.order.tasks.order_notification.tasks import update_order_google_sheet
 from api.telegram_bot.tasks.notifications.tasks import (
     send_notification_with_new_order_to_order_chat,
+    send_order_chat_suitable_masters,
 )
 
 
@@ -59,6 +60,7 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
 
     def create(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
         # check if master exist in oder city
+        # print(request.data)
         # if request.data.get('city') is None:
         #     return Response(data={'city': 'Field is required'}, status=status.HTTP_400_BAD_REQUEST)
         # masters = master_exist_in_city(city=request.data['city'])
@@ -80,7 +82,11 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
         order.refresh_from_db()
         update_order_google_sheet.delay(order.pk)
 
+        # send notifications to order chat
         send_notification_with_new_order_to_order_chat.delay(response.data['id'])
+        send_order_chat_suitable_masters.delay(
+            response.data['city'].lower(), response.data['work_sphere'], response.data['id']
+        )
 
         # TODO
 
