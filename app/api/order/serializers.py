@@ -33,7 +33,7 @@ class OrderModelSerializer(serializers.ModelSerializer):
     """ Model Serializer for model Order """
 
     order_files = OrderImageModelSerializer(many=True, read_only=True)
-    city = serializers.CharField(max_length=100, write_only=True)
+    city = serializers.CharField(max_length=100, required=True)
     customer_name = serializers.CharField(read_only=True)
     customer_phone_number = serializers.CharField(read_only=True)
     master = OrderMasterModelSerializer(many=True, read_only=True)
@@ -44,7 +44,7 @@ class OrderModelSerializer(serializers.ModelSerializer):
         read_only_fields = ['customer', 'date_created', 'master']
         extra_kwargs = {
             'work_sphere': {'required': True},
-            'types_of_work': {'required': True}
+            'types_of_work': {'required': True},
         }
 
 
