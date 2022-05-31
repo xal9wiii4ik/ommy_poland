@@ -13,7 +13,6 @@ urlpatterns = [
     path('api/', include(('api.order.urls', 'order'), namespace='order')),
     path('api/', include(('api.master.urls', 'master'), namespace='master')),
     path('api/', include(('api.authenticate.urls', 'authenticate'), namespace='authenticate')),
-    path('api/', include(('api.payments.urls', 'authenticate'), namespace='payments')),
 ]
 
 urlpatterns += doc_urls
