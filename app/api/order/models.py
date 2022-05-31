@@ -89,9 +89,7 @@ class Order(models.Model):
     )
 
     def __str__(self) -> str:
-        return f'pk: {self.pk}, address: {self.address}, ' \
-               f'date_created: {self.date_created}, ' \
-               f'status: {self.status}, work_sphere: {self.work_sphere}'
+        return f'id: {self.pk}'
 
 
 class OrderFile(models.Model):

@@ -29,7 +29,7 @@ class Master(models.Model):
     city = models.CharField(max_length=100, verbose_name='city')
 
     def __str__(self) -> str:
-        return f'pk: {self.pk}, first_name: {self.user.first_name}, last_name: {self.user.last_name}, city: {self.city}'
+        return f'id: {self.pk}, city: {self.city}'
 
 
 class MasterExperience(models.Model):

@@ -32,7 +32,7 @@ def send_notification_with_new_order_to_order_chat(order_pk: int) -> None:
     message = f'New order id: {order.pk}\n' \
               f'========Order info========\n' \
               f'Work_sphere: {serializer_data["work_sphere_name"]}\n' \
-              f'Order work type: {order.types_of_work}\n' \
+              f'Order work type: {order.types_of_work[0].replace("[", "").replace("]", "")}\n' \
               f'Number Employees: {order.number_employees}\n' \
               f'Work duration: {order.desired_time_end_work}\n' \
               f'Start work time: {serializer_data["start_time"]}\n' \
@@ -47,6 +47,30 @@ def send_notification_with_new_order_to_order_chat(order_pk: int) -> None:
     send_files_for_notifications(order=order, chat_id=settings.ORDER_CHAT_ID)
 
     logging.info(f'Notification to ommy chat with new order: {order_pk} was sent')
+
+
+@shared_task
+def send_order_chat_suitable_masters(city: str, work_sphere_pk: int, order_pk: int):
+    """
+    Send notification to order chat with suitable masters
+    Args:
+        city: order city
+        work_sphere_pk: work_sphere pk
+        order_pk: order pk
+    """
+
+    from api.master.models import Master
+    from api.telegram_bot.loader import dp
+
+    masters = Master.objects.select_related('user').filter(city=city, master_experience__work_sphere=work_sphere_pk)
+    message = f'order id: {order_pk}:\n' \
+              f'========suitable masters info========\n'
+    message = message + '\n'.join(
+        f'id: {master.pk} \n'
+        f'name: {master.user.first_name} {master.user.last_name} \n'
+        f'phone number: {master.user.phone_number}' for master in masters
+    )
+    dp.loop.run_until_complete(dp.bot.send_message(chat_id=settings.ORDER_CHAT_ID, text=message))
 
 
 @shared_task
@@ -86,7 +110,6 @@ def notification_with_coming_order(order_pk: int) -> None:
     dp.loop.run_until_complete(dp.bot.send_message(chat_id=settings.ORDER_CHAT_ID, text=message))
 
     logging.info(f'Notification to ommy chat with coming order: {order_pk} was sent')
-
 
 # @shared_task
 # def send_notification_with_new_order_to_masters_chats(order_pk: int) -> None:
