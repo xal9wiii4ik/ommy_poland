@@ -109,5 +109,4 @@ class OrderFile(models.Model):
     bucket_path = models.CharField(max_length=1056, verbose_name='Bucket path')
 
     def __str__(self) -> str:
-        return f'pk: {self.pk}, order_id: {self.order.pk}, ' \
-               f'order_name: {self.order.name}, bucket_path: {self.bucket_path}'
+        return f'pk: {self.pk}, order_id: {self.order.pk}'

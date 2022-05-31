@@ -23,7 +23,8 @@ class Commission(models.Model):
         max_digits=8,
         decimal_places=2,
         verbose_name='Commission amount',
-        validators=[validate_positive_number]
+        validators=[validate_positive_number],
+        null=True
     )
     closing_order_datetime = models.DateTimeField(null=True, blank=True, verbose_name='Closing order date')
 
