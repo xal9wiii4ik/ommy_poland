@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from api.master.models import Master
 from api.order.models import Order, OrderFile
@@ -46,6 +47,12 @@ class OrderModelSerializer(serializers.ModelSerializer):
             'work_sphere': {'required': True},
             'types_of_work': {'required': True},
         }
+
+    def validate_city(self, city: str) -> str:
+        exist = Master.objects.filter(city=city.lower()).exists()
+        if not exist:
+            raise ValidationError('We haven`t masters in your city yet')
+        return city
 
 
 class GoogleSheetOrderSerializer(serializers.ModelSerializer):

@@ -66,7 +66,7 @@ def send_order_chat_suitable_masters(city: str, work_sphere_pk: int, order_pk: i
     message = f'order id: {order_pk}:\n' \
               f'========suitable masters info========\n'
     message = message + '\n'.join(
-        f'id: {master.pk} \n'
+        f'master id: {master.pk} \n'
         f'name: {master.user.first_name} {master.user.last_name} \n'
         f'phone number: {master.user.phone_number}' for master in masters
     )

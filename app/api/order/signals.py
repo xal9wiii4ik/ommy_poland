@@ -17,7 +17,6 @@ def remove_stores_from_user_managed_groups(instance: Order,
 
     from api.payments.models import Commission
 
-    # TODO add tests
     if action == 'post_add':
         commission, created = Commission.objects.get_or_create(order=instance)
         count_masters = len(pk_set) if created else instance.master.all().count()
