@@ -46,7 +46,32 @@ class RegisterUserTestCase(SetupAPITestCase):
             serializer.is_valid(raise_exception=True)
         except ValidationError as e:
             expected_exception = {
-                'password': [ErrorDetail(string='Пароль должен содержать латинские буквы и цыфры', code='invalid')]
+                'password': [ErrorDetail(
+                    string='Пароль должен содержать латинские буквы и цыфры и содержать 8 и больше симовлов',
+                    code='invalid')
+                ]
+            }
+            self.assertEqual(expected_exception, e.detail)
+
+    def test_invalid_password_less_8_characters(self) -> None:
+        try:
+            data = {
+                'password': '1234567',
+                'repeat_password': '1234567',
+                'email': 'some@email.ru',
+                'first_name': 'first_name',
+                'last_name': 'last_name',
+                'phone_number': '+375292105978',
+                'middle_name': 'middle'
+            }
+            serializer = UserRegisterSerializer(data=data)
+            serializer.is_valid(raise_exception=True)
+        except ValidationError as e:
+            expected_exception = {
+                'password': [ErrorDetail(
+                    string='Пароль должен содержать латинские буквы и цыфры и содержать 8 и больше симовлов',
+                    code='invalid')
+                ]
             }
             self.assertEqual(expected_exception, e.detail)
 

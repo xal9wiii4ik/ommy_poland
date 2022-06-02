@@ -14,6 +14,8 @@ class User(AbstractUser):
     USERNAME_FIELD = 'phone_number'
     username = None
 
+    first_name = models.CharField(max_length=150, blank=False)
+    last_name = models.CharField(max_length=150, blank=False)
     middle_name = models.CharField(max_length=150, verbose_name='middle name', null=True, blank=True)
     phone_number = models.CharField(verbose_name='Phone Number', max_length=13, unique=True)
     address = models.CharField(verbose_name='Master address',

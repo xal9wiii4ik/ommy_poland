@@ -3,8 +3,6 @@ import re
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
-from django.contrib.auth import password_validation
-
 
 def password_validate(password: str) -> str:
     """
@@ -12,11 +10,12 @@ def password_validate(password: str) -> str:
     """
 
     regular_expression = r'^[A-Za-z0-9_]*$'
-    if re.search(regular_expression, password):
-        password_validation.validate_password(password=password)
+    if re.search(regular_expression, password) and len(password) >= 8:
         return password
     else:
-        raise serializers.ValidationError('Пароль должен содержать латинские буквы и цыфры')
+        raise serializers.ValidationError(
+            'Пароль должен содержать латинские буквы и цыфры и содержать 8 и больше симовлов'
+        )
 
 
 def repeat_password_validate(password: str, repeat_password: str) -> str:
