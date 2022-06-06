@@ -1,4 +1,3 @@
-
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
@@ -21,4 +20,5 @@ class CommissionModelAdmin(admin.ModelAdmin):
         return obj.order.id
 
     list_display = ('id', 'master_id', 'order_id', 'amount', 'closing_order_datetime',)
-    list_filter = ('master__id', 'closing_order_datetime',)
+    list_filter = ('closing_order_datetime',)
+    search_fields = ('master__id',)
