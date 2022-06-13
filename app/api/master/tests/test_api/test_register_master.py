@@ -38,7 +38,7 @@ class RegisterMasterTest(SetupAPITestCase):
 
     @mock.patch('api.authenticate.tasks.activate_user.tasks.send_phone_activate_message.delay')
     def test_register_account_master_experience(self, *args: tp.List[tp.Any]) -> None:
-        self.assertEqual(0, MasterExperience.objects.all().count())
+        master_experiences_count = MasterExperience.objects.all().count()
         account_count = Master.objects.all().count()
 
         url = reverse('master:register')
@@ -69,4 +69,4 @@ class RegisterMasterTest(SetupAPITestCase):
         response = self.client.post(path=url, data=json_data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Master.objects.all().count(), account_count + 1)
-        self.assertEqual(2, MasterExperience.objects.all().count())
+        self.assertEqual(master_experiences_count + 2, MasterExperience.objects.all().count())

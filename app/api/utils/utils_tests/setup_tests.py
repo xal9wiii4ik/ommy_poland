@@ -11,7 +11,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from api.authenticate.models import ActivateAccountCode
-from api.master.models import Master, WorkSphere
+from api.master.models import Master, WorkSphere, MasterExperience
 from api.order.models import Order, OrderStatus
 from ommy_polland import settings
 
@@ -95,6 +95,7 @@ class SetupAPITestCase(APITestCase):
         self.work_sphere_2 = WorkSphere.objects.create(
             name='second'
         )
+
         # setup masters
         self.master_1 = Master.objects.create(user=self.user_master_1,
                                               longitude=14,
@@ -104,6 +105,11 @@ class SetupAPITestCase(APITestCase):
                                               longitude=16,
                                               latitude=17,
                                               city='wroclaw')
+
+        # setup master experiences
+        self.master_experience_1 = MasterExperience.objects.create(experience=1,
+                                                                   work_sphere=self.work_sphere_1,
+                                                                   master=self.master_1)
 
         # setup orders
         self.order_1 = Order.objects.create(

@@ -58,17 +58,17 @@ def calculate_distance(order_longitude: float,
     return distance_kilometers
 
 
-def master_exist_in_city(city: str) -> QuerySet:
+def master_exist_in_city(city: str, work_sphere_name: str) -> QuerySet:
     """
-    Check if master exist in order city
+    Check if master with suitable work sphere exist in order city
     Args:
         city: order city
+        work_sphere_name: work sphere name
     Returns:
-        True if master exist
         QuerySet if exist
     """
 
-    masters = Master.objects.filter(city=city.lower())
+    masters = Master.objects.filter(city=city.lower(), master_experience__work_sphere=work_sphere_name)
     return masters
 
 

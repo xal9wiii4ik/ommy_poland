@@ -63,7 +63,7 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
         # print(request.data)
         # if request.data.get('city') is None:
         #     return Response(data={'city': 'Field is required'}, status=status.HTTP_400_BAD_REQUEST)
-        # masters = master_exist_in_city(city=request.data['city'])
+        # masters = master_exist_in_city(city=request.data['city'], work_sphere_name=request.data['work_sphere'])
         # if not masters:
         #     return Response(
         #         data={'masters': 'У нас пока что нет мастеров в вашем городе'},
