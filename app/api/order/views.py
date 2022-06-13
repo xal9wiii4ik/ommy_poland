@@ -71,13 +71,14 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
         #         status=status.HTTP_400_BAD_REQUEST
         #     )
 
+        print(request.FILES)
         # create order and order file and send notification
         response = super(OrderCreateOnlyViewSet, self).create(request, *args, **kwargs)
 
         order = Order.objects.get(pk=response.data.get('id'))
 
         if request.FILES:
-            logging.info(f'Expect {len(request.FILES)} for order {response["id"]}')
+            logging.info(f'Expect {len(request.FILES)} for order {response.data["id"]}')
             create_order_files(files=self.request.FILES.pop('files'),
                                order=order)
 
