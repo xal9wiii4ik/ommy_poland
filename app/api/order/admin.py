@@ -34,6 +34,6 @@ class OrderFileModelAdmin(admin.ModelAdmin):
     @staticmethod
     def move_to_order(obj: OrderFile) -> SafeString:
         link = reverse('admin:order_order_change', args=[obj.order.pk])
-        return format_html(f'<a href="{link}">{obj.order.name}</a>')
+        return format_html(f'<a href="{link}">{obj.order.pk}</a>')
 
     list_display = ('pk', 'move_to_order', 'display_file')
