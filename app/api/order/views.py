@@ -1,3 +1,4 @@
+import logging
 import typing as tp
 
 from django.db.models import F, Value
@@ -76,6 +77,7 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
         order = Order.objects.get(pk=response.data.get('id'))
 
         if request.FILES:
+            logging.info(f'Expect {len(request.FILES)} for order {response["id"]}')
             create_order_files(files=self.request.FILES.pop('files'),
                                order=order)
 
