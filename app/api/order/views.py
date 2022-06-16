@@ -71,7 +71,6 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
         #         status=status.HTTP_400_BAD_REQUEST
         #     )
 
-        print(request.FILES)
         # create order and order file and send notification
         response = super(OrderCreateOnlyViewSet, self).create(request, *args, **kwargs)
 

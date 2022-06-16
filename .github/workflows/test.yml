@@ -36,7 +36,6 @@ jobs:
           echo DEFAULT_SUPER_USER_EMAIL=${{ secrets.DEFAULT_SUPER_USER_EMAIL }} >> .env
           echo BOT_TOKEN=${{ secrets.BOT_TOKEN }} >> .env
           echo ORDER_CHAT_ID=${{ secrets.ORDER_CHAT_ID }} >> .env
-          echo STAGE_ORDER_CHAT_ID=${{ secrets.STAGE_ORDER_CHAT_ID }} >> .env
           echo ADMINS=${{ secrets.ADMINS }} >> .env
           echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
           echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env

@@ -13,14 +13,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', default='123')  # type: ignore
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', default=True)  # type: ignore
+DEBUG = bool(int(os.environ.get('DEBUG', default=0)))  # type: ignore
 
 # MANAGEMENT HOSTS AND CORS
 ALLOWED_HOSTS: tp.List[str] = os.environ.get('ALLOWED_HOSTS', default='').split(',')  # type: ignore
 CSRF_TRUSTED_ORIGINS: tp.List[str] = os.environ.get('CSRF_TRUSTED_ORIGINS', default='').split(',')  # type: ignore
-# CORS_ALLOWED_ORIGINS: tp.List[str] = os.environ.get('CORS_ALLOWED_ORIGINS', default='').split(',')  # type: ignore
-# TODO update this(can be on stage, not prod)
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = bool(int(os.environ.get('CORS_ORIGIN_ALLOW_ALL', default=0)))  # type: ignore
+if not CORS_ORIGIN_ALLOW_ALL:
+    CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS').split(',')  # type: ignore
 CORS_ALLOW_CREDENTIALS = True
 
 INSTALLED_APPS = [
@@ -196,8 +196,6 @@ CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:{REDIS_PORT}/0'  # type: ignore
 # TELEGRAM SETTINGS
 BOT_TOKEN = os.environ.get('BOT_TOKEN')  # type: ignore
 ORDER_CHAT_ID = os.environ.get('ORDER_CHAT_ID')  # type: ignore
-STAGE_BOT_TOKEN = os.environ.get('STAGE_BOT_TOKEN')  # type: ignore
-STAGE_ORDER_CHAT_ID = os.environ.get('STAGE_ORDER_CHAT_ID')  # type: ignore
 ADMINS_CHAT_IDS = os.environ.get('ADMINS', default='').split(',')  # type: ignore
 
 # AWS

@@ -1,0 +1,102 @@
+version: '3.7'
+
+services:
+  web:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: ommy_poland/Dockerfile.prod
+    container_name: ommy_web
+    entrypoint: ./entrypoints/web_entrypoint.sh
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/ommy_poland/app/mediafiles
+      - ./ommy_poland/app/:/app/
+    env_file:
+      - ./ommy_poland/.env
+    expose:
+      - 8000
+    depends_on:
+      - db
+
+  bot:
+    build:
+      context: .
+      dockerfile: ommy_poland/Dockerfile.prod
+    container_name: ommy_bot
+    command: python manage.py run_bot
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/ommy_poland/app/mediafiles
+      - ./ommy_poland/app/:/app/
+    env_file:
+      - ./ommy_poland/.env
+    depends_on:
+      - web
+
+  nginx:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: front-docker/Dockerfile
+    container_name: ommy_front
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - static_volume:/staticfiles
+      - ./ommy2.0/018-react-bp/:/app/frontend/
+      - ./data/nginx:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+
+  certbot:
+    image: certbot/certbot
+    container_name: ommy_certbot
+    restart: unless-stopped
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  db:
+    image: postgres:13.0-alpine
+    container_name: ommy_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./ommy_poland/.env.db
+
+  redis:
+    container_name: ommy_redis
+    image: redis:alpine
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ommy_poland/Dockerfile.prod
+    container_name: ommy_celery_worker
+    command: celery -A ommy_polland worker -E --soft-time-limit=86400 --concurrency=12 --loglevel=info  -n worker@%h
+    links:
+      - redis
+    volumes:
+      - static_volume:/staticfiles
+      - media_volume/:/mediafiles
+      - ./ommy_poland/app/:/app/
+    env_file:
+      - ./ommy_poland/.env
+    deploy:
+      mode: replicated
+      replicas: 3
+    depends_on:
+      - web
+      - db
+      - bot_1
+      - redis
+
+volumes:
+  static_volume:
+  media_volume:
+  postgres_data:
