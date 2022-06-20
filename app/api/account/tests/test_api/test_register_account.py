@@ -14,7 +14,6 @@ class RegisterAccountTest(SetupAPITestCase):
     Test cases for register account
     """
 
-    # TODO update mock twilio
     @mock.patch('api.authenticate.tasks.activate_user.tasks.send_phone_activate_message.delay')
     # @mock.patch('api.utils.tasks_utils.send_phone_message')
     def test_register_account(self, *args: tp.List[tp.Any]) -> None:

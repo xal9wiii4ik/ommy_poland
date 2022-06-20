@@ -4,9 +4,7 @@ from django.utils import timezone
 
 
 class ActivateAccountCode(models.Model):
-    """
-    Model which contain user account and codes for activating this accounts
-    """
+    """ Model which contain user account and codes for activating this accounts """
 
     class Meta:
         verbose_name = 'Activate Account Code'
@@ -16,7 +14,7 @@ class ActivateAccountCode(models.Model):
                              on_delete=models.CASCADE,
                              verbose_name='activate code for user')
     code = models.BigIntegerField(verbose_name='activate code')
-    created_datetime = models.DateTimeField(auto_now_add=True)
+    created_date = models.DateField(auto_now_add=True)
     last_resend_datetime = models.DateTimeField(verbose_name='Last resend code datetime',
                                                 default=timezone.now,
                                                 null=True,

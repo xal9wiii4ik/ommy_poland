@@ -10,7 +10,7 @@ from api.utils.tasks_utils import send_phone_message
 from ommy_polland import settings
 
 
-# TODO add link, update commisiya
+# TODO add link, update commission
 @shared_task
 def send_notification_with_new_order_to_masters(order_pk: int,
                                                 masters_phone_numbers: tp.List[str],
@@ -61,7 +61,6 @@ def send_notification_with_new_order_to_masters(order_pk: int,
 
 
 # TODO add link to message
-# TODO add prefetch related(N+1) if necessary needed
 @shared_task
 def send_masters_info_to_customer(order_pk: int) -> None:
     """
@@ -72,7 +71,7 @@ def send_masters_info_to_customer(order_pk: int) -> None:
 
     from api.order.models import Order
 
-    order = Order.objects.get(pk=order_pk)
+    order = Order.objects.prefetch_related('order_master').get(pk=order_pk)
     masters = order.master.all()
 
     message = 'Мастер(а) найден(ы)\n' \
@@ -116,7 +115,6 @@ def send_search_master_status_to_customer(order_pk: int, current_time: str):
         send_phone_message(message=message, recipients_number=order.customer.phone_number)
 
 
-# TODO add prefetch related(N+1) if necessary needed
 @shared_task
 def send_masters_notification_with_cancel_order(order_pk: int) -> None:
     """
@@ -129,7 +127,7 @@ def send_masters_notification_with_cancel_order(order_pk: int) -> None:
 
     client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
 
-    order = Order.objects.get(pk=order_pk)
+    order = Order.objects.prefetch_related('order_master').get(pk=order_pk)
     order_masters = order.master.all()
 
     message = f'Заказ {order.name}, по адресу {order.address} был отменен'
@@ -159,7 +157,6 @@ def update_order_google_sheet(order_pk: int):
 
     work_sheet = sheet.worksheet(settings.ORDER_WORK_SHEET)
 
-    # TODO update commission
     order = Order.objects.select_related('customer').select_related('work_sphere').annotate(
         phone_number=F('customer__phone_number'),
         work_sphere_name=F('work_sphere__name'),

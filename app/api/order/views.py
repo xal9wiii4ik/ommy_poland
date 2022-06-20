@@ -60,17 +60,6 @@ class OrderCreateOnlyViewSet(mixins.ListModelMixin,
         return Response(serializer.data)
 
     def create(self, request: Request, *args: tp.Any, **kwargs: tp.Any) -> Response:
-        # check if master exist in oder city
-        # print(request.data)
-        # if request.data.get('city') is None:
-        #     return Response(data={'city': 'Field is required'}, status=status.HTTP_400_BAD_REQUEST)
-        # masters = master_exist_in_city(city=request.data['city'], work_sphere_name=request.data['work_sphere'])
-        # if not masters:
-        #     return Response(
-        #         data={'masters': 'У нас пока что нет мастеров в вашем городе'},
-        #         status=status.HTTP_400_BAD_REQUEST
-        #     )
-
         # create order and order file and send notification
         response = super(OrderCreateOnlyViewSet, self).create(request, *args, **kwargs)
 

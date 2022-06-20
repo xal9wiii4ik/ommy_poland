@@ -3,9 +3,9 @@ from django.utils.translation import gettext_lazy as _
 
 
 def validate_less_then_forty(value):
-    if value > 40:
+    if value > 99:
         raise ValidationError(
-            _('%(value)s should be less then 40'),
+            _('%(value)s should be less then 99'),
             params={'value': value},
         )
 

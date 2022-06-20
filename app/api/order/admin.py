@@ -18,7 +18,6 @@ class OrderModelAdmin(admin.ModelAdmin):
             return obj.work_sphere.name
         return 'Work sphere was remove'
 
-    # TODO add masters to list display
     list_display = ('id', 'order_work_sphere', 'types_of_work', 'customer',
                     'start_time', 'number_employees', 'price', 'status', 'city')
 

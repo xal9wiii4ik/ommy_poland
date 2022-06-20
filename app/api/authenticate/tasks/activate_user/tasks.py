@@ -1,12 +1,13 @@
+import logging
 import random
-
+from datetime import timedelta
 
 from celery import shared_task
+from django.utils import timezone
 
 from api.utils.tasks_utils import send_phone_message
 
 
-# TODO add beat task for removing codes(mb if more than 1 day)
 @shared_task
 def send_phone_activate_message(user_pk: int) -> None:
     """
@@ -35,3 +36,17 @@ def resend_code(phone_number: str, code: int) -> None:
     """
 
     send_phone_message(message=f'Ваш код подтверждения: {code}', recipients_number=phone_number)
+
+
+@shared_task(name='authenticate.remove_old_codes')
+def remove_old_codes() -> None:
+    """ Remove old codes """
+
+    from api.authenticate.models import ActivateAccountCode
+
+    current_date = timezone.now()
+    delta = current_date - timedelta(days=2)
+    activation_codes = ActivateAccountCode.objects.filter(last_resend_datetime__lte=delta)
+    if activation_codes:
+        logging.info(f'{len(activation_codes)} activation code(s) will be deleted')
+        activation_codes.delete()
