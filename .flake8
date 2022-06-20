@@ -1,8 +1,6 @@
 [flake8]
 # ANN101 - type annotation for self
 # ANN102 - type annotation for cls in class methods
-# T101 - TODO notes
-# T000 - TODO notes
 # FI** - weird future warning
 extend-ignore = FI10,FI11,FI12,FI13,FI14,FI15,FI16,FI17,FI18,ANN101,ANN102,T101,T000
 count = True
