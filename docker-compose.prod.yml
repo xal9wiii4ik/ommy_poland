@@ -93,8 +93,26 @@ services:
     depends_on:
       - web
       - db
-      - bot_1
+      - bot
       - redis
+
+    celery_beat:
+      build:
+        context: .
+        dockerfile: ommy_poland/Dockerfile.prod
+      container_name: ommy_celery_beat
+      command: celery -A ommy_polland beat -l info
+      volumes:
+        - ./static_volume/:/staticfiles
+        - ./media_volume/:/mediafiles
+        - ./ommy_poland/app/:/app/
+      env_file:
+        - ./ommy_poland/.env
+      depends_on:
+        - web
+        - db
+        - bot
+        - redis
 
 volumes:
   static_volume:

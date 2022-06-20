@@ -1,7 +1,5 @@
-import typing as tp
 
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 
 from api.master.models import Master
 from api.order.models import Order, OrderFile
@@ -49,15 +47,6 @@ class OrderModelSerializer(serializers.ModelSerializer):
             'work_sphere': {'required': True},
             'types_of_work': {'required': True},
         }
-
-    def validate(self, attrs: tp.Dict[str, tp.Any]) -> tp.Dict[str, tp.Any]:
-        is_exist = Master.objects.filter(
-            city=attrs['city'].lower(),
-            master_experience__work_sphere=attrs['work_sphere']
-        ).exists()
-        if not is_exist:
-            raise ValidationError({'masters': 'We haven`t masters in your city with suitable work sphere yet'})
-        return attrs
 
 
 class GoogleSheetOrderSerializer(serializers.ModelSerializer):
