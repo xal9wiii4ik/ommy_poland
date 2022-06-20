@@ -17,8 +17,8 @@ jobs:
           echo DEBUG=${{ secrets.DEBUG }} >> .env
           echo TIME_ZONE=${{ secrets.TIME_ZONE }} >> .env
           echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
-          echo CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }} >> .env
           echo CSRF_TRUSTED_ORIGINS=${{ secrets.CSRF_TRUSTED_ORIGINS }} >> .env
+          echo CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }} >> .env
           echo ACCESS_TOKEN_LIFETIME=${{ secrets.ACCESS_TOKEN_LIFETIME }} >> .env
           echo REFRESH_TOKEN_LIFETIME=${{ secrets.REFRESH_TOKEN_LIFETIME }} >> .env
           echo ALGORITHM=${{ secrets.ALGORITHM }} >> .env
