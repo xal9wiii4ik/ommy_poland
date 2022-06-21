@@ -7,7 +7,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from api.master.models import Master, WorkSphere
-from api.order.models_validators import validate_less_then_forty, validate_positive_number
+from api.order.models_validators import validate_less_then_ninety, validate_positive_number
 
 
 def get_file_type(file_bytes: bytes) -> str:
@@ -60,10 +60,13 @@ class Order(models.Model):
                                  related_name='order_customer',
                                  null=True)
     number_employees = models.PositiveIntegerField(
-        validators=[validate_less_then_forty],
+        validators=[validate_less_then_ninety],
         verbose_name='Employees number'
     )
-    desired_time_end_work = models.CharField(max_length=40, verbose_name='Work duration')
+    desired_time_end_work = models.PositiveIntegerField(
+        validators=[validate_less_then_ninety],
+        verbose_name='Work duration'
+    )
     start_time = models.DateTimeField(verbose_name='work start time')
     price = models.DecimalField(max_digits=8,
                                 decimal_places=2,

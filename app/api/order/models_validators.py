@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 
-def validate_less_then_forty(value):
+def validate_less_then_ninety(value):
     if value > 99:
         raise ValidationError(
             _('%(value)s should be less then 99'),
