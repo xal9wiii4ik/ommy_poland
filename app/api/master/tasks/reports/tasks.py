@@ -16,7 +16,7 @@ def update_master_info_google_sheet(masters_ids: tp.List[int], start_date: str, 
         end_date: end date for average commission
     """
 
-    from django.db.models import Avg, Q
+    from django.db.models import Q, Sum
     from api.master.models import Master
     from api.master.serializers import MasterWorkSheetSerializer
 
@@ -28,10 +28,10 @@ def update_master_info_google_sheet(masters_ids: tp.List[int], start_date: str, 
     work_sheet = sheet.worksheet(settings.MASTER_WORK_SHEET)
 
     queryset = Master.objects.select_related('user').prefetch_related('master_experience').annotate(
-        amount=Avg(
+        amount=Sum(
             'master_commission__amount',
             filter=Q(master_commission__closing_order_datetime__range=[start_date, end_date])
-        )
+        ),
     ).filter(id__in=masters_ids)
 
     serializer = MasterWorkSheetSerializer(queryset, many=True)
