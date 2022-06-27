@@ -29,7 +29,7 @@ def create_master_account(
         password=data['password'],
         is_active=False,
         is_master=True,
-        middle_name=data['middle_name'],
+        middle_name=data.get('middle_name'),
         address=data.get('address')
     )
     del data['password']
