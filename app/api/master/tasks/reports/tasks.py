@@ -16,6 +16,9 @@ def update_master_info_google_sheet(masters_ids: tp.List[int], start_date: str, 
         end_date: end date for average commission
     """
 
+    print(start_date)
+    print(end_date)
+
     from django.db.models import Q, Sum
     from api.master.models import Master
     from api.master.serializers import MasterWorkSheetSerializer

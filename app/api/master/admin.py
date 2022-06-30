@@ -1,5 +1,6 @@
 import typing as tp
 
+
 from django.contrib import admin
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import QuerySet
@@ -43,11 +44,11 @@ class MasterModelAdmin(admin.ModelAdmin):
             form = DateRangeForm(request.POST)
 
             if form.is_valid():
-                update_master_info_google_sheet.delay(
-                    [master.pk for master in queryset],
-                    form.cleaned_data['start'],
-                    form.cleaned_data['end']
-                )
+                start_datetime = form.cleaned_data['start']
+                end_datetime = form.cleaned_data['end']
+                if start_datetime == end_datetime:
+                    end_datetime = end_datetime.replace(hour=23, minute=59, second=59)
+                update_master_info_google_sheet.delay([master.pk for master in queryset], start_datetime, end_datetime)
             self.message_user(request, 'Google sheet will be updated')
             return HttpResponseRedirect(request.get_full_path())
         return render(
