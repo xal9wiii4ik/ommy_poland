@@ -10,7 +10,7 @@ class WorkSphere(models.Model):
     name = models.CharField(max_length=50, verbose_name='work sphere name')
 
     def __str__(self) -> str:
-        return f'pk: {self.pk}, name: {self.name}'
+        return f'id: {self.pk}, name: {self.name}'
 
 
 class Master(models.Model):
